@@ -490,6 +490,7 @@ function App() {
             </div>
           </div>
           <hr />
+          <Board/>
         </>
   )
 }

@@ -1,13 +1,29 @@
+import {
+    ContextMenu,
+    ContextMenuContent,
+    ContextMenuItem,
+    ContextMenuTrigger,
+    ContextMenuSeparator,
+} from "@/components/ui/context-menu"
+
 const Card = ({card}) => {
     return ( 
-        <>
-            <img 
-                src={card.imageUrl} 
-                alt={card.name} 
-                className="h-64 rounded-xl hover:scale-95 transition shadow-md shadow-slate-500/50" 
-            />
-        </>
-     );
+        <ContextMenu>
+            <ContextMenuTrigger asChild className="h-64 rounded-xl hover:scale-95 transition" >
+                    <img 
+                        src={card.imageUrl} 
+                        alt={card.name} 
+                    />
+            </ContextMenuTrigger>
+            <ContextMenuContent>
+                <ContextMenuItem>Profile</ContextMenuItem>
+                <ContextMenuItem>Billing</ContextMenuItem>
+                <ContextMenuSeparator />
+                <ContextMenuItem>Team</ContextMenuItem>
+                <ContextMenuItem>Subscription</ContextMenuItem>
+            </ContextMenuContent>
+        </ContextMenu>
+    );
 }
 
 export default Card

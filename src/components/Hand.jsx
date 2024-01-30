@@ -29,7 +29,7 @@ const Hand = () => {
                         {
                             cards.map((card) => {
                                 return(
-                                        <Card  card={card} key={card.id} />
+                                    <Card  card={card} key={card.id} />
                                 )
                             })
                         }

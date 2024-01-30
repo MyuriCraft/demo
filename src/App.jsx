@@ -1,9 +1,10 @@
 import './App.css';
 import { useEffect, useState, useRef } from 'react';
 import { jugadores } from './datos';
-import { decks } from './datos/decks';
-import { cartas } from './datos/cartas';
-import Carta from './componentes/carta';
+import { decks } from './data/decks';
+import { cartas } from './data/cartas';
+import Carta from './components/Carta';
+import Board from './components/Board';
 
 /*function App() {
   const [jugadores_activos, set_jugadores_activos] = useState([])
@@ -255,57 +256,57 @@ function App() {
   function render_mano(){
     return(
       <div 
-        fluid
-        style={{
-          backgroundColor: 'blue'
-        }}
-      >
-        <div>
-          {mano.map((obj, i) => (
-            <Carta  
-              key={i}
-              id={obj}
-              tipo={'mano'}
-              func_deck={(val) => {
-                var aux_mano = JSON.parse(JSON.stringify(mano));
-                var aux_deck = JSON.parse(JSON.stringify(deck_cartas));
+          fluid
+          style={{
+            backgroundColor: 'blue'
+          }}
+        >
+          <div>
+            {mano.map((obj, i) => (
+              <Carta  
+                key={i}
+                id={obj}
+                tipo={'mano'}
+                func_deck={(val) => {
+                  var aux_mano = JSON.parse(JSON.stringify(mano));
+                  var aux_deck = JSON.parse(JSON.stringify(deck_cartas));
 
-                aux_mano.splice(i, 1);
-                set_mano(aux_mano)
-                switch (val) {
-                  case 0:
-                    aux_deck.push(obj);
-                    set_deck_cartas(barajar(aux_deck))
-                  break;
-                  case 1:
-                    aux_deck.unshift(obj);
-                    set_deck_cartas(aux_deck)
-                  break;
-                  case 2:
-                    aux_deck.push(obj);
-                    set_deck_cartas(aux_deck)
-                  break;
-                  default:
-                }
-              }}
-              func_inv={() => {
-                var aux_mano = JSON.parse(JSON.stringify(mano)); 
-                var campo = null;
-                if(cartas[aux_mano[i]]['tipo'] === 'tierra'){
-                  campo = JSON.parse(JSON.stringify(campo_tierras)); 
-                  campo.push(aux_mano[i]);
-                  set_campo_tierras(campo)
-                }else{
-                  campo = JSON.parse(JSON.stringify(campo_criaturas)); 
-                  campo.push(aux_mano[i]);
-                  set_campo_criaturas(campo)
-                }
-                aux_mano.splice(i, 1);
-                set_mano(aux_mano)
-              }}
-            />
-          ))}
-        </div>
+                  aux_mano.splice(i, 1);
+                  set_mano(aux_mano)
+                  switch (val) {
+                    case 0:
+                      aux_deck.push(obj);
+                      set_deck_cartas(barajar(aux_deck))
+                    break;
+                    case 1:
+                      aux_deck.unshift(obj);
+                      set_deck_cartas(aux_deck)
+                    break;
+                    case 2:
+                      aux_deck.push(obj);
+                      set_deck_cartas(aux_deck)
+                    break;
+                    default:
+                  }
+                }}
+                func_inv={() => {
+                  var aux_mano = JSON.parse(JSON.stringify(mano)); 
+                  var campo = null;
+                  if(cartas[aux_mano[i]]['tipo'] === 'tierra'){
+                    campo = JSON.parse(JSON.stringify(campo_tierras)); 
+                    campo.push(aux_mano[i]);
+                    set_campo_tierras(campo)
+                  }else{
+                    campo = JSON.parse(JSON.stringify(campo_criaturas)); 
+                    campo.push(aux_mano[i]);
+                    set_campo_criaturas(campo)
+                  }
+                  aux_mano.splice(i, 1);
+                  set_mano(aux_mano)
+                }}
+              />
+            ))}
+          </div>
       </div>
     )
   }
@@ -444,7 +445,7 @@ function App() {
   }
 
   return(
-        <div style={{ display: "flex", height:'100vh', flexDirection: 'column' }}>
+        <>
           {render_criaturas()}
           {render_tierras()}
           <div 
@@ -488,7 +489,8 @@ function App() {
               deck
             </div>
           </div>
-        </div>
+          <hr />
+        </>
   )
 }
 

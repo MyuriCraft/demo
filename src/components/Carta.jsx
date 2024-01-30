@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { cartas } from '../datos/cartas';
+import { cartas } from '../data/cartas';
 
 
 function Carta({ id, tipo, func_inv, func_mano, func_deck }){

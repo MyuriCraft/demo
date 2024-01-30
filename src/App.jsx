@@ -1,12 +1,9 @@
 import './App.css';
 import { useEffect, useState, useRef } from 'react';
 import { jugadores } from './datos';
-import Carta from './componentes/carta';
 import { decks } from './datos/decks';
 import { cartas } from './datos/cartas';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import Carta from './componentes/carta';
 
 /*function App() {
   const [jugadores_activos, set_jugadores_activos] = useState([])
@@ -257,13 +254,13 @@ function App() {
 
   function render_mano(){
     return(
-      <Container 
+      <div 
         fluid
         style={{
           backgroundColor: 'blue'
         }}
       >
-        <Row>
+        <div>
           {mano.map((obj, i) => (
             <Carta  
               key={i}
@@ -308,8 +305,8 @@ function App() {
               }}
             />
           ))}
-        </Row>
-      </Container>
+        </div>
+      </div>
     )
   }
 
@@ -334,7 +331,7 @@ function App() {
 
   function render_criaturas(){
     return(
-      <Container 
+      <div 
         fluid
         style={{
           backgroundColor: 'red',
@@ -342,9 +339,9 @@ function App() {
           flex: 2
         }}
       >
-        <Row>
+        <div>
           {campo_criaturas.map((obj, i) => (
-            <Col>
+            <div>
               <Carta  
                 key={i}
                 id={obj}
@@ -382,16 +379,16 @@ function App() {
                   }
                 }}
               />
-            </Col>
+            </div>
           ))}
-        </Row>
-      </Container>
+        </div>
+      </div>
     )
   }
 
   function render_tierras(){
     return(
-      <Container 
+      <div 
         fluid
         style={{
           backgroundColor: 'green',
@@ -399,10 +396,10 @@ function App() {
           flex: 2
         }}
       >
-        <Row>
+        <div>
           {campo_tierras.map((obj, i) => (
-            <Col>
-              <Carta  
+            <div>
+              <Carta
                 key={i}
                 id={obj}
                 tipo={'campo'}
@@ -439,16 +436,14 @@ function App() {
                   }
                 }}
               />
-            </Col>
+            </div>
           ))}
-        </Row>
-      </Container>
+        </div>
+      </div>
     )
   }
 
   return(
-    <html>
-      <body>
         <div style={{ display: "flex", height:'100vh', flexDirection: 'column' }}>
           {render_criaturas()}
           {render_tierras()}
@@ -494,8 +489,6 @@ function App() {
             </div>
           </div>
         </div>
-      </body>
-    </html>
   )
 }
 

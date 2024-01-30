@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { cartas } from '../datos/cartas';
-import Container from 'react-bootstrap/Container';
-import Col from 'react-bootstrap/Col';
+
 
 function Carta({ id, tipo, func_inv, func_mano, func_deck }){
   const [mostrar, set_mostrar] = useState(false)
@@ -99,7 +98,7 @@ function Carta({ id, tipo, func_inv, func_mano, func_deck }){
         {render_contadores()}
       </div>
       {mostrar && (
-        <Container
+        <div
           style={{
             display: 'table', 
             position: 'absolute',
@@ -110,7 +109,7 @@ function Carta({ id, tipo, func_inv, func_mano, func_deck }){
             flex: 1,
           }}
         >  
-          <Col>
+          <div>
             Opciones
             {tipo === 'mano' ? (
               <div
@@ -257,8 +256,8 @@ function Carta({ id, tipo, func_inv, func_mano, func_deck }){
             >
               Cerrar
             </div>
-          </Col>
-        </Container>
+          </div>
+        </div>
       )}
     </div>
   )

@@ -1,259 +1,60 @@
 import './App.css';
-import { useEffect, useState, useRef } from 'react';
-import { jugadores } from './datos';
+import { useEffect, useState } from 'react';
 import { decks } from './data/decks';
 import { cartas } from './data/cartas';
 import Carta from './components/Carta';
-import Board from './components/Board';
-
-/*function App() {
-  const [jugadores_activos, set_jugadores_activos] = useState([])
-  const [rivales_activos, set_rivales_activos] = useState([])
-  const [resultados_jugadores, set_resultados_jugadores] = useState([])
-  const [resultados_rivales, set_resultados_rivales] = useState([])
-  
-  useEffect(() => {
-    set_jugadores_activos(['jugador', 'jugador_mini'])
-    set_rivales_activos(['rival', 'jugador_mini'])
-  }, [])
-
-  function getRandomArbitrary(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-
-  function handle_dice(){
-    let aux_jugadores = [];
-    jugadores_activos.forEach(dato => {
-      aux_jugadores.push({ jugador: dato, cantidad: Math.floor(getRandomArbitrary(jugadores[dato]['dado_min'], jugadores[dato]['dado_max'])) })
-    });
-    set_resultados_jugadores(aux_jugadores)
-
-    let aux_rivales = [];
-    rivales_activos.forEach(dato => {
-      aux_rivales.push({ jugador: dato, cantidad: Math.floor(getRandomArbitrary(jugadores[dato]['dado_min'], jugadores[dato]['dado_max'])) })
-    });
-    set_resultados_rivales(aux_rivales)
-  }
-
-  function resultado(){
-    let resultado = '';
-    if(result_dice(false) != 0 && result_dice(true) != 0){
-      if(result_dice(false) == result_dice(true)){
-        resultado = 'Empate'
-      }
-      if(result_dice(false) < result_dice(true)){
-        resultado = 'jugador gana'
-      }
-      if(result_dice(false) > result_dice(true)){
-        resultado = 'rival gana'
-      }
-    }
-
-    return(
-      <div>
-        {resultado}
-      </div>
-    )
-  }
-
-  function imagen_dado(dato){
-    switch(dato){
-      case 1: return require('./assets/icono_dado_uno.png');
-      case 2: return require('./assets/icono_dado_dos.png');
-      case 3: return require('./assets/icono_dado_tres.png');
-      case 4: return require('./assets/icono_dado_cuatro.png');
-      case 5: return require('./assets/icono_dado_cinco.png');
-      case 6: return require('./assets/icono_dado_seis.png');
-    }
-  }
-
-  function result_dice(tipo){
-    let total = 0;
-    if(tipo){
-      resultados_jugadores.forEach(dato => {
-        total += dato['cantidad']
-      })
-    }else{
-      resultados_rivales.forEach(dato => {
-        total += dato['cantidad']
-      })
-    }
-
-    return total;
-  }
-
-  function color_resultado(){
-    let color = 'white'
-    if(result_dice(false) == result_dice(true)){
-      color = 'yellow'
-    }
-    if(result_dice(false) > result_dice(true)){
-      color = 'red'
-    }
-    if(result_dice(false) < result_dice(true)){
-      color = 'green'
-    }
-    console.log(color)
-    return color;
-  }
-
-  function find_resul(nombre, tipo){
-    let index;
-    if(tipo){
-      index = resultados_jugadores.findIndex(
-        (dato) => (dato['jugador'] == nombre)
-      );
-    }else{
-      index = resultados_rivales.findIndex(
-        (dato) => (dato['jugador'] == nombre)
-      );
-    }
-    return index;
-  }
-
-  return(
-    <div>
-      <div
-        style = {{
-          background: "white",
-          width: '100%',
-          display: 'flex',
-          justifyContent: 'center',
-        }}
-        onClick = {() => handle_dice()}
-      >
-        Tirar dados
-      </div>
-      <div
-        style={{
-          flexDirection: 'row',
-          display: "flex",
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}
-      >
-        <div 
-          style={{ 
-            display: 'flex',
-            width: '50%',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column'
-          }}
-        >
-          {
-            jugadores_activos.map((obj, i) => {
-              return(
-                <div 
-                  key = {i}
-                  style={{ 
-                    display: 'flex',
-                    width: '100%',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexDirection: 'column'
-                  }}
-                >
-                  <div
-                    style = {{
-                      background: "white",
-                      width: '100%',
-                      display: 'flex',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {jugadores[obj]['nombre']}
-                  </div>
-                  {
-                    find_resul(obj, true) >= 0 && resultados_jugadores[find_resul(obj, true)]['cantidad'] > 0 ? (
-                      <div>
-                        <img src = {imagen_dado(resultados_jugadores[find_resul(obj, true)]['cantidad'])} alt="Logo" />
-                      </div>
-                    ):null
-                  }
-                </div>
-              )
-            })
-          }
-        </div>
-        <div 
-          style={{ 
-            background: "white",
-            display: 'flex',
-            width: '50%',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column'
-          }}
-        >
-          {
-            rivales_activos.map((obj, i) => {
-              return(
-                <div 
-                  key = {i}
-                  style={{ 
-                    display: 'flex',
-                    width: '100%',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexDirection: 'column'
-                  }}
-                >
-                  <div
-                    style = {{
-                      background: "white",
-                      width: '100%',
-                      display: 'flex',
-                      justifyContent: 'center',
-                    }}
-                  >
-                    {jugadores[obj]['nombre']}
-                  </div>
-                  {
-                    find_resul(obj, false) >= 0 && resultados_rivales[find_resul(obj, false)]['cantidad'] > 0 ? (
-                      <div>
-                        <img src = {imagen_dado(resultados_rivales[find_resul(obj, false)]['cantidad'])} alt="Logo" />
-                      </div>
-                    ):null  
-                  }
-                </div>
-              )
-            })
-          }
-        </div>
-      </div>
-        {
-         <div
-            style = {{
-              background: color_resultado(),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexDirection: 'column'
-            }}
-          >
-            {resultado()}
-          </div>
-        }
-    </div>
-  );
-}*/
+import { db } from './firebase';
+import { onValue, ref, set } from "firebase/database";
+import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTrigger } from './components/ui/drawer';
+import { Button } from './components/ui/button';
+import Card from './components/Card';
 
 function App() {
-  const [mano, set_mano] = useState([
-    'wastes',
-  ])
-  const [campo_tierras, set_campo_tierras] = useState([
-    'wastes',
-    'wastes',
-    'wastes',
-    'wastes',
-    'wastes',
-  ])
+  const [id_sesion, set_id_sesion] = useState(uniqid())
+  const [mano, set_mano] = useState([])
+  const [campo_tierras, set_campo_tierras] = useState([])
   const [campo_criaturas, set_campo_criaturas] = useState([])
   const [deck_cartas, set_deck_cartas] = useState(decks['prueba']['cartas'])
+  const [mano_enemigo, set_mano_enemigo] = useState([])
+  const [campo_tierras_enemigo, set_campo_tierras_enemigo] = useState([])
+  const [campo_criaturas_enemigo, set_campo_criaturas_enemigo] = useState([])
+  const [vista, set_vista] = useState('propia')
+
+  useEffect(() => {
+    const query = ref(db, "movimientos/");
+    return onValue(query, (snapshot) => {
+      if (snapshot.exists()) {
+        Object.keys(snapshot.toJSON()).forEach(function(key) {
+          if(key !== id_sesion){
+            set_mano_enemigo(snapshot.toJSON()[key]['mano'] ?? [])
+            set_campo_tierras_enemigo(snapshot.toJSON()[key]['tierras'] ?? [])
+            set_campo_criaturas_enemigo(snapshot.toJSON()[key]['criaturas'] ?? [])
+          }
+        });
+      }
+    });
+  }, [])
+
+  useEffect(() => {
+    if(mano.length > 0 || campo_criaturas.length > 0 || campo_tierras.length > 0)
+    set(ref(db, 'movimientos/' + id_sesion), {
+      mano: mano,
+      criaturas: campo_criaturas,
+      tierras: campo_tierras
+    }).catch((err) => console.log(err))
+  }, [mano, campo_criaturas, campo_tierras])
+
+  function uniqid(prefix = "", random = false) {
+    const sec = Date.now() * 1000 + Math.random() * 1000;
+    const id = sec.toString(16).replace(/\./g, "").padEnd(14, "0");
+    return `${prefix}${id}${random ? `.${Math.trunc(Math.random() * 100000000)}`:""}`;
+}
 
   function render_mano(){
+    var datos = Object.values(mano_enemigo);
+    if(vista === 'propia'){
+      datos = mano;
+    }
     return(
       <div 
           fluid
@@ -262,7 +63,7 @@ function App() {
           }}
         >
           <div>
-            {mano.map((obj, i) => (
+            {datos.map((obj, i) => (
               <Carta  
                 key={i}
                 id={obj}
@@ -288,6 +89,8 @@ function App() {
                     break;
                     default:
                   }
+                  
+
                 }}
                 func_inv={() => {
                   var aux_mano = JSON.parse(JSON.stringify(mano)); 
@@ -331,6 +134,10 @@ function App() {
   }
 
   function render_criaturas(){
+    var datos = Object.values(campo_criaturas_enemigo);
+    if(vista === 'propia'){
+      datos = campo_criaturas;
+    }
     return(
       <div 
         fluid
@@ -341,7 +148,7 @@ function App() {
         }}
       >
         <div>
-          {campo_criaturas.map((obj, i) => (
+          {datos.map((obj, i) => (
             <div>
               <Carta  
                 key={i}
@@ -388,6 +195,11 @@ function App() {
   }
 
   function render_tierras(){
+    var datos = Object.values(campo_tierras_enemigo);
+    if(vista === 'propia'){
+      datos = campo_tierras;
+    }
+    console.log(datos)
     return(
       <div 
         fluid
@@ -398,7 +210,7 @@ function App() {
         }}
       >
         <div>
-          {campo_tierras.map((obj, i) => (
+          {datos.map((obj, i) => (
             <div>
               <Carta
                 key={i}
@@ -445,9 +257,140 @@ function App() {
   }
 
   return(
+    <section className="h-dvh bg-slate-100 flex flex-col">
+      <div className="basis-1/3 bg-slate-300">
+        {campo_criaturas.map((card, i) => 
+          <Card 
+            key={i} 
+            card={{
+              name: card,
+              imageUrl: cartas[card]['img']
+            }} 
+            inv={() => {
+              var aux_mano = JSON.parse(JSON.stringify(mano)); 
+              var campo = null;
+              if(cartas[aux_mano[i]]['tipo'] === 'tierra'){
+                campo = JSON.parse(JSON.stringify(campo_tierras)); 
+                campo.push(aux_mano[i]);
+                set_campo_tierras(campo)
+              }else{
+                campo = JSON.parse(JSON.stringify(campo_criaturas)); 
+                campo.push(aux_mano[i]);
+                set_campo_criaturas(campo)
+              }
+              aux_mano.splice(i, 1);
+              set_mano(aux_mano)
+            }}
+          />
+        )}
+      </div>
+      <div className="basis-1/3 bg-slate-200">
+        {campo_tierras.map((card, i) => 
+          <Card 
+            key={i} 
+            card={{
+              name: card,
+              imageUrl: cartas[card]['img']
+            }} 
+            inv={() => {
+              var aux_mano = JSON.parse(JSON.stringify(mano)); 
+              var campo = null;
+              if(cartas[aux_mano[i]]['tipo'] === 'tierra'){
+                campo = JSON.parse(JSON.stringify(campo_tierras)); 
+                campo.push(aux_mano[i]);
+                set_campo_tierras(campo)
+              }else{
+                campo = JSON.parse(JSON.stringify(campo_criaturas)); 
+                campo.push(aux_mano[i]);
+                set_campo_criaturas(campo)
+              }
+              aux_mano.splice(i, 1);
+              set_mano(aux_mano)
+            }}
+          />
+        )}
+      </div>
+      <div className="basis-1/3">
+        <Drawer>
+          <DrawerTrigger>
+            <Button variant="outline">Hand</Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader>
+              <DrawerDescription className="flex gap-4 overflow-x-auto">
+                <div
+                  onClick={() => {
+                    if(deck_cartas.length > 0){
+                      var aux_mano = JSON.parse(JSON.stringify(mano));
+                      var aux_deck = JSON.parse(JSON.stringify(deck_cartas));
+
+                      aux_mano.push(aux_deck[0])
+                      set_mano(aux_mano)
+
+                      aux_deck.splice(0, 1)
+                      set_deck_cartas(aux_deck)
+                    }else{
+                      console.log(deck_cartas.length)
+                    }
+                  }}
+                >
+                  Deck
+                </div>
+                {mano.map((card, i) => 
+                  <Card 
+                    key={i} 
+                    card={{
+                      name: card,
+                      imageUrl: cartas[card]['img']
+                    }} 
+                    inv={() => {
+                      var aux_mano = JSON.parse(JSON.stringify(mano)); 
+                      var campo = null;
+                      if(cartas[aux_mano[i]]['tipo'] === 'tierra'){
+                        campo = JSON.parse(JSON.stringify(campo_tierras)); 
+                        campo.push(aux_mano[i]);
+                        set_campo_tierras(campo)
+                      }else{
+                        campo = JSON.parse(JSON.stringify(campo_criaturas)); 
+                        campo.push(aux_mano[i]);
+                        set_campo_criaturas(campo)
+                      }
+                      aux_mano.splice(i, 1);
+                      set_mano(aux_mano)
+                    }}
+                  />
+                )}
+              </DrawerDescription>
+            </DrawerHeader>
+            <DrawerFooter>
+              <DrawerClose>
+                <Button variant="outline">Cerrar</Button>
+              </DrawerClose>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
+      </div>
+    </section>
+  )
+
+  /*return(
         <>
-          {render_criaturas()}
-          {render_tierras()}
+          <div 
+            style={{ 
+              display: "flex", 
+              flex: 1,
+              flexDirection: 'row', 
+            }} 
+            onClick={() => set_vista(vista === 'propia' ? 'enemiga':'propia')}
+          >
+            cambiar a vista {vista === 'propia' ? 'del enemigo':'propia'}
+          </div>
+          {
+            render_criaturas()
+          }
+          {
+            render_tierras()
+          }
           <div 
             style={{ 
               display: "flex", 
@@ -467,20 +410,19 @@ function App() {
               }} 
               onClick={() => {
                 if(deck_cartas.length > 0){
-                  console.log('aa')
                   var aux_mano = JSON.parse(JSON.stringify(mano));
                   var aux_deck = JSON.parse(JSON.stringify(deck_cartas));
-                  console.log(aux_deck)
                   var carta = 0
 
-                  console.log(carta)
 
                   aux_mano.push(aux_deck[carta])
-                  console.log(aux_mano)
                   set_mano(aux_mano)
 
                   aux_deck.splice(carta, 1)
                   set_deck_cartas(aux_deck)
+
+  
+
                 }else{
                   console.log(deck_cartas.length)
                 }
@@ -490,9 +432,8 @@ function App() {
             </div>
           </div>
           <hr />
-          <Board/>
         </>
-  )
+  )*/
 }
 
 export default App;

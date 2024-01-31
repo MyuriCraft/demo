@@ -26,7 +26,7 @@ const Card = ({ card, inv }) => {
 
 	return( 
 		<ContextMenu>
-			<ContextMenuTrigger asChild className="h-64 rounded-xl hover:scale-95 transition" >
+			<ContextMenuTrigger asChild className="h-full max-h-64 rounded-xl hover:scale-95 transition" >
 				<img 
 					src={card.imageUrl} 
 					alt={card.name} 

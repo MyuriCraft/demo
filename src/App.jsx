@@ -11,8 +11,19 @@ import Card from './components/Card';
 
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
+import { Routes, Route } from 'react-router-dom';
+import GameStart from './components/GameStart';
 
-function App() {
+function App(){
+  return(
+    <Routes>
+      <Route path='/' element={<GameStart/>}/>
+      <Route path='/board' element={<Board/>}/>
+    </Routes>
+  )
+}
+
+function Board() {
   const [id_sesion, set_id_sesion] = useState(uniqid())
   const [mano, set_mano] = useState([])
   const [campo_tierras, set_campo_tierras] = useState([])
@@ -22,6 +33,12 @@ function App() {
   const [campo_tierras_enemigo, set_campo_tierras_enemigo] = useState([])
   const [campo_criaturas_enemigo, set_campo_criaturas_enemigo] = useState([])
   const [vista, set_vista] = useState('propia')
+
+  const [jugador, set_jugador] = useState({
+    mano: [],
+    tierra: [],
+    criatura: []
+  })
 
   useEffect(() => {
     const query = ref(db, "movimientos/");
@@ -52,6 +69,7 @@ function App() {
     const id = sec.toString(16).replace(/\./g, "").padEnd(14, "0");
     return `${prefix}${id}${random ? `.${Math.trunc(Math.random() * 100000000)}`:""}`;
   }
+
   const handleClick = () => {
     if(deck_cartas.length > 0){
       var aux_mano = JSON.parse(JSON.stringify(mano));
@@ -274,59 +292,39 @@ function App() {
     )
   }
 
+  const handle_card_state = ({ id, action, tipo }) => {
+    var data = JSON.parse(JSON.stringify(jugador));
+    switch (action) {
+      case 'rotate':
+        data[tipo][id]['rotacion'] = data[tipo][id]['rotacion'] === '0deg' ? '90deg':'0deg';
+      break;
+      case 'hide':
+        data[tipo][id]['cubierta'] = !data[tipo][id]['cubierta'];
+      break;
+      default:
+    }
+    set_jugador(data)
+  }
+
+  function render(tipo){
+    return(
+      jugador[tipo].map((card, i) => 
+        <Card 
+          key={i} 
+          card={card} 
+          func_card_state = {(action) => handle_card_state({ ...action, id: i })}
+        />
+      )
+    )
+  }
+
   return(
     <section className="h-dvh bg-slate-100 flex flex-col">
       <div className="basis-1/3 bg-slate-300 h-2/6">
-        {campo_criaturas.map((card, i) => 
-          <Card 
-            key={i} 
-            card={{
-              name: card,
-              imageUrl: cartas[card]['img']
-            }} 
-            inv={() => {
-              var aux_mano = JSON.parse(JSON.stringify(mano)); 
-              var campo = null;
-              if(cartas[aux_mano[i]]['tipo'] === 'tierra'){
-                campo = JSON.parse(JSON.stringify(campo_tierras)); 
-                campo.push(aux_mano[i]);
-                set_campo_tierras(campo)
-              }else{
-                campo = JSON.parse(JSON.stringify(campo_criaturas)); 
-                campo.push(aux_mano[i]);
-                set_campo_criaturas(campo)
-              }
-              aux_mano.splice(i, 1);
-              set_mano(aux_mano)
-            }}
-          />
-        )}
+        {render('criatura')}
       </div>
       <div className="basis-1/3 bg-slate-200 h-2/6">
-        {campo_tierras.map((card, i) => 
-          <Card 
-            key={i} 
-            card={{
-              name: card,
-              imageUrl: cartas[card]['img']
-            }} 
-            inv={() => {
-              var aux_mano = JSON.parse(JSON.stringify(mano)); 
-              var campo = null;
-              if(cartas[aux_mano[i]]['tipo'] === 'tierra'){
-                campo = JSON.parse(JSON.stringify(campo_tierras)); 
-                campo.push(aux_mano[i]);
-                set_campo_tierras(campo)
-              }else{
-                campo = JSON.parse(JSON.stringify(campo_criaturas)); 
-                campo.push(aux_mano[i]);
-                set_campo_criaturas(campo)
-              }
-              aux_mano.splice(i, 1);
-              set_mano(aux_mano)
-            }}
-          />
-        )}
+        {render('tierra')}
       </div>
       <div className="basis-1/3 flex flex-row-reverse h-2/6">
         <Toaster position="top-right" />
@@ -348,32 +346,31 @@ function App() {
                   mano.map((card, i) => 
                     <Card 
                       key={i} 
-                      card={{
-                        name: card,
-                        imageUrl: cartas[card]['img']
-                      }} 
+                      card={cartas[card]}
                       inv={() => {
                         var aux_mano = JSON.parse(JSON.stringify(mano)); 
-                        var campo = null;
-                        if(cartas[aux_mano[i]]['tipo'] === 'tierra'){
-                          campo = JSON.parse(JSON.stringify(campo_tierras)); 
-                          campo.push(aux_mano[i]);
-                          set_campo_tierras(campo)
-                        }else{
-                          campo = JSON.parse(JSON.stringify(campo_criaturas)); 
-                          campo.push(aux_mano[i]);
-                          set_campo_criaturas(campo)
-                        }
+
+                        var jugador_aux = JSON.parse(JSON.stringify(jugador)); 
+                        jugador_aux[cartas[aux_mano[i]]['tipo']].push({
+                          ...cartas[card],
+                          rotacion: '0deg',
+                          cubierta: false,
+                        });
+                        set_jugador(jugador_aux)
+
+                       
                         aux_mano.splice(i, 1);
                         set_mano(aux_mano)
                       }}
                     />
                   )
                 }
-                {mano.length == "0" ? 
-                  <img src="https://media.newyorker.com/photos/62d85d3d3b3e14a2fb1cf46e/16:9/w_1280,c_limit/site_deRecat_hand.jpg" 
-                  className='h-64 object-cover w-50'/>
-                : null }
+                {mano.length === 0 && 
+                  <img 
+                    src="https://media.newyorker.com/photos/62d85d3d3b3e14a2fb1cf46e/16:9/w_1280,c_limit/site_deRecat_hand.jpg" 
+                    className='h-64 object-cover w-50'
+                  />
+                }
               </DrawerDescription>
             </DrawerHeader>
             <DrawerFooter className="flex flex-row flex-row-reverse gap-4">

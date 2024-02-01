@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+
+import { Button } from "@/components/ui/button"
 import Card from './Card';
 
 const NavPage = (props) => {
@@ -7,7 +9,7 @@ const NavPage = (props) => {
             <p className='grow'>Página: {props.page}</p>
             {
                 props.page > 1 &&
-                    <button className='px-3 py-2 text-xs font-medium text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+                    <Button variant="outline"
                     onClick={()=> props.setPage(props.page - 1)}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3.5 h-3.5 me-2">
@@ -15,17 +17,17 @@ const NavPage = (props) => {
                     </svg>
 
                     Anterior 
-                </button>
+                </Button>
             }
             
-            <button className='px-3 py-2 text-xs font-medium text-center inline-flex items-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+            <Button 
                 onClick={()=> props.setPage(props.page + 1)}
             >
                 Siguiente
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-3.5 h-3.5 ms-2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
-            </button>
+            </Button>
         </div>
         
     )

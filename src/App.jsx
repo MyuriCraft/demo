@@ -8,6 +8,8 @@ import { onValue, ref, set } from "firebase/database";
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTrigger } from './components/ui/drawer';
 import { Button } from './components/ui/button';
 import Card from './components/Card';
+import BoardSection from './components/layouts/BoardSection';
+
 
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -320,22 +322,22 @@ function Board() {
 
   return(
     <section className="h-dvh bg-slate-100 flex flex-col">
-      <div className="basis-1/3 bg-slate-300 h-2/6">
+      <BoardSection bgColor="slate-300">
         {render('criatura')}
-      </div>
-      <div className="basis-1/3 bg-slate-200 h-2/6">
+      </BoardSection>
+      <BoardSection bgColor="slate-200">
         {render('tierra')}
+      </BoardSection>
+      <div className="basis-1/3 h-2/6 flex flex-row-reverse px-2 py-2">
+          <div onClick={handleClick} >
+            <img 
+            src="https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg"
+            alt="Deck Magic" 
+            className='h-full rounded-xl'
+            />
+          </div>
       </div>
-      <div className="basis-1/3 flex flex-row-reverse h-2/6">
-        <Toaster position="top-right" />
-        <button onClick={handleClick} >
-          <img 
-          src="https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg"
-          alt="Deck Magic" 
-          className='h-full rounded-xl'
-          />
-        </button>
-        <Drawer>
+      <Drawer>
           <DrawerTrigger>
             <Button variant="outline" className="absolute bottom-0 left-0">Ver mano</Button>
           </DrawerTrigger>
@@ -383,8 +385,7 @@ function Board() {
             </DrawerFooter>
           </DrawerContent>
         </Drawer>
-      </div>
-
+      <Toaster position="top-right" />           
     </section>
   )
 

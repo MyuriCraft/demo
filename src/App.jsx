@@ -10,7 +10,6 @@ import { Button } from './components/ui/button';
 import Card from './components/Card';
 import BoardSection from './components/layouts/BoardSection';
 
-
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Routes, Route } from 'react-router-dom';
@@ -322,21 +321,24 @@ function Board() {
 
   return(
     <section className="h-dvh bg-slate-100 flex flex-col">
-      <BoardSection bgColor="slate-300">
+      <BoardSection bgColor='slate-300'>
         {render('criatura')}
       </BoardSection>
-      <BoardSection bgColor="slate-200">
-        {render('tierra')}
+      <BoardSection bgColor='slate-200'>
+        Artefactos, encantamientos, planeswalkers, batallas, otros.
       </BoardSection>
-      <div className="basis-1/3 h-2/6 flex flex-row-reverse px-2 py-2">
-          <div onClick={handleClick} >
+      <BoardSection bgColor='slate-100' flexDirection='row-reverse' justifyContent='justify-between'>
+        <div onClick={handleClick} >
             <img 
             src="https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg"
             alt="Deck Magic" 
             className='h-full rounded-xl'
             />
-          </div>
-      </div>
+        </div>
+        <div className='flex justify-end gap-2'>
+          {render('tierra')}
+        </div>
+      </BoardSection>
       <Drawer>
           <DrawerTrigger>
             <Button variant="outline" className="absolute bottom-0 left-0">Ver mano</Button>
@@ -369,8 +371,8 @@ function Board() {
                 }
                 {mano.length === 0 && 
                   <img 
-                    src="https://media.newyorker.com/photos/62d85d3d3b3e14a2fb1cf46e/16:9/w_1280,c_limit/site_deRecat_hand.jpg" 
-                    className='h-64 object-cover w-50'
+                    src="https://i.imgflip.com/1vtkg0.jpg" 
+                    className='h-64 object-cover w-[200px] border rounded-md'
                   />
                 }
               </DrawerDescription>

@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input"
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { decks } from "@/data/decks";
+import { Button } from "@/components/ui/button"
 
 const GameStart = () => {
 	const [deck, set_deck] = useState([]);
@@ -25,10 +26,13 @@ const GameStart = () => {
 	}, [])
 
 	return ( 
-		<div className="grid gap-4 place-content-center h-dvh bg-red-50">
+		<div className="grid gap-4 place-content-center h-dvh bg-blue-50">
 			<Input type="text" placeholder="Jugador" />
 			<Input type="text" placeholder="Enemigo" />
-			<Link to='/board'>Entrar</Link>
+
+			<Button>
+				<Link to="/board">Login</Link>
+			</Button>
 		</div>
 	);
 }

@@ -38,8 +38,13 @@ function Board() {
   const [jugador, set_jugador] = useState({
     mano: [],
     tierra: [],
-    criatura: []
+    criatura: [],
+    resto: []
   })
+
+  useEffect(() => {
+    set_deck_cartas(barajar(JSON.parse(localStorage.getItem("deck"))))
+  }, [])
 
   useEffect(() => {
     const query = ref(db, "movimientos/");
@@ -295,6 +300,7 @@ function Board() {
 
   const handle_card_state = ({ id, action, tipo }) => {
     var data = JSON.parse(JSON.stringify(jugador));
+    console.log(tipo)
     switch (action) {
       case 'rotate':
         data[tipo][id]['rotacion'] = data[tipo][id]['rotacion'] === '0deg' ? '90deg':'0deg';
@@ -313,6 +319,7 @@ function Board() {
         <Card 
           key={i} 
           card={card} 
+          place={'board'}
           func_card_state = {(action) => handle_card_state({ ...action, id: i })}
         />
       )
@@ -325,7 +332,7 @@ function Board() {
         {render('criatura')}
       </BoardSection>
       <BoardSection bgColor='slate-200'>
-        Artefactos, encantamientos, planeswalkers, batallas, otros.
+        {render('resto')}
       </BoardSection>
       <BoardSection bgColor='slate-100' flexDirection='row-reverse' justifyContent='justify-between'>
         <div onClick={handleClick} >
@@ -350,16 +357,39 @@ function Board() {
                   mano.map((card, i) => 
                     <Card 
                       key={i} 
-                      card={cartas[card]}
+                      card={card}
+                      place={'hand'}
+                      ret_deck={() => {
+                        var aux_mano = JSON.parse(JSON.stringify(mano));
+                        var aux_deck = JSON.parse(JSON.stringify(deck_cartas));
+                        
+                        aux_deck.push(aux_mano[i])
+                        aux_mano.splice(i, 1)
+
+
+                        set_mano(aux_mano)
+                        set_deck_cartas(barajar(aux_deck))
+                        toast.success("Carta devuelta al deck")
+                      }}
                       inv={() => {
                         var aux_mano = JSON.parse(JSON.stringify(mano)); 
+                        var jugador_aux = JSON.parse(JSON.stringify(jugador));
 
-                        var jugador_aux = JSON.parse(JSON.stringify(jugador)); 
-                        jugador_aux[cartas[aux_mano[i]]['tipo']].push({
-                          ...cartas[card],
+                        var tipo = 'resto';
+                        if(card['type_line'].toLowerCase().includes('creature')){
+                          tipo = 'criatura';
+                        }
+                        if(card['type_line'].toLowerCase().includes('land')){
+                          tipo = 'tierra';
+                        }
+                        
+
+                        jugador_aux[tipo].push({
+                          ...card,
                           rotacion: '0deg',
                           cubierta: false,
                         });
+
                         set_jugador(jugador_aux)
 
                        

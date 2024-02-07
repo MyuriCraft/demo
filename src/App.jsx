@@ -1,6 +1,6 @@
 import './App.css';
 import { useEffect, useState } from 'react';
-import { decks } from './data/decks';
+
 import { cartas } from './data/cartas';
 import Carta from './components/Carta';
 import { db } from './firebase';
@@ -13,7 +13,24 @@ import BoardSection from './components/layouts/BoardSection';
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Routes, Route } from 'react-router-dom';
+
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuSub,
+  ContextMenuSubTrigger,
+  ContextMenuSubContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  ContextMenuSeparator,
+} from "@/components/ui/context-menu"
 import GameStart from './components/GameStart';
+
+import graveyardImg from './assets/graveyard.webp';
+import exiledImg from './assets/darkhole.jpeg';
+import handImg from './assets/hand.jpeg';
+
+
 
 function App(){
   return(
@@ -29,7 +46,7 @@ function Board() {
   const [mano, set_mano] = useState([])
   const [campo_tierras, set_campo_tierras] = useState([])
   const [campo_criaturas, set_campo_criaturas] = useState([])
-  const [deck_cartas, set_deck_cartas] = useState(decks['prueba']['cartas'])
+  const [deck_cartas, set_deck_cartas] = useState([])
   const [mano_enemigo, set_mano_enemigo] = useState([])
   const [campo_tierras_enemigo, set_campo_tierras_enemigo] = useState([])
   const [campo_criaturas_enemigo, set_campo_criaturas_enemigo] = useState([])
@@ -335,20 +352,39 @@ function Board() {
         {render('resto')}
       </BoardSection>
       <BoardSection bgColor='slate-100' flexDirection='row-reverse' justifyContent='justify-between'>
-        <div onClick={handleClick} >
-            <img 
-            src="https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg"
-            alt="Deck Magic" 
-            className='h-full rounded-xl'
-            />
-        </div>
+        
+        <ContextMenu>
+          <ContextMenuTrigger asChild >
+            <div onClick={handleClick} >
+              <img 
+              src="https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg"
+              alt="Deck Magic" 
+              className='h-full rounded-xl hover:scale-95 transition'
+              />
+            </div>
+          </ContextMenuTrigger>
+          <ContextMenuContent className="w-64">
+            <ContextMenuItem inset>Robar carta</ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem inset>Barajar</ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem inset>Ver tope</ContextMenuItem>
+            <ContextMenuItem inset>Revelar tope</ContextMenuItem>
+            <ContextMenuItem inset>Descartar Tope</ContextMenuItem>
+            <ContextMenuItem inset>Exiliar Tope</ContextMenuItem>
+            <ContextMenuSeparator />
+            <ContextMenuItem inset>Buscar carta</ContextMenuItem>
+          </ContextMenuContent>
+        </ContextMenu>
+
         <div className='flex justify-end gap-2'>
           {render('tierra')}
         </div>
       </BoardSection>
-      <Drawer>
+      {/* Drawer para ver MANO */}
+        <Drawer>
           <DrawerTrigger>
-            <Button variant="outline" className="absolute bottom-0 left-0">Ver mano</Button>
+            <Button variant="outline" className="absolute bottom-0 left-[0px]">Mano</Button>
           </DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>
@@ -401,7 +437,7 @@ function Board() {
                 }
                 {mano.length === 0 && 
                   <img 
-                    src="https://i.imgflip.com/1vtkg0.jpg" 
+                    src={handImg} 
                     className='h-64 object-cover w-[200px] border rounded-md'
                   />
                 }
@@ -417,6 +453,49 @@ function Board() {
             </DrawerFooter>
           </DrawerContent>
         </Drawer>
+      {/* Drawer para ver CEMENTERIO */}
+      <Drawer>
+        <DrawerTrigger>
+            <Button variant="outline" className="absolute bottom-0 left-[80px]">Cementerio</Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerDescription className="flex gap-4 overflow-x-auto">
+              <img 
+                src={graveyardImg}
+                className='h-64 object-cover w-[200px] border rounded-md'
+              />
+            </DrawerDescription>
+          </DrawerHeader>
+          <DrawerFooter className="flex flex-row flex-row-reverse gap-4">
+            <DrawerClose>
+              <Button variant="outline">Ocultar</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+      {/* Drawer para ver EXILIO */}
+      <Drawer>
+        <DrawerTrigger>
+            <Button variant="outline" className="absolute bottom-0 left-[200px]">Exilio</Button>
+        </DrawerTrigger>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerDescription className="flex gap-4 overflow-x-auto">
+              <img 
+                src={exiledImg}
+                className='h-64 object-cover w-[200px] border rounded-md'
+              />
+            </DrawerDescription>
+          </DrawerHeader>
+          <DrawerFooter className="flex flex-row flex-row-reverse gap-4">
+            <DrawerClose>
+              <Button variant="outline">Ocultar</Button>
+            </DrawerClose>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
+
       <Toaster position="top-right" />           
     </section>
   )

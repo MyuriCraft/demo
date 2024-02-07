@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input"
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
 
 const GameStart = () => {
 	const [loading, set_loading] = useState(false);
@@ -20,20 +21,25 @@ const GameStart = () => {
     reader.onload = async (e) => { 
       const text = (e.target.result)
 			text.split('\n').map(async (obj) => {
-				const index = obj.indexOf(' ');
-				var carta_data = await fetch_card(obj.slice(index, obj.length).replaceAll(' ', '+'));
-				aux_deck.push({
-					...carta_data,
-					rotacion: '0deg',
-					cubierta: false
-				});
-				if(obj.slice(0, index) > 1){
-					for(var a = 0; a < Number(obj.slice(0, index)) - 1; a++){
-						aux_deck.push({
-							...carta_data,
-							rotacion: '0deg',
-							cubierta: false
-						});
+				if(obj !== ''){
+					const index = obj.indexOf(' ');
+					
+					console.log(obj)
+					var carta_data = await fetch_card(obj.slice(index, obj.length).replaceAll(' ', '+'));
+					console.log(carta_data)
+					aux_deck.push({
+						...carta_data,
+						rotacion: '0deg',
+						cubierta: false
+					});
+					if(obj.slice(0, index) > 1){
+						for(var a = 0; a < Number(obj.slice(0, index)) - 1; a++){
+							aux_deck.push({
+								...carta_data,
+								rotacion: '0deg',
+								cubierta: false
+							});
+						}
 					}
 				}
 				localStorage.setItem("deck", JSON.stringify(aux_deck));
@@ -47,14 +53,15 @@ const GameStart = () => {
 		<div className="grid gap-4 place-content-center h-dvh bg-blue-50">
 			<Input type="text" placeholder="Jugador" />
 			<Input type="text" placeholder="Enemigo" />
-			<input type="file" onChange={(e) => handle_file(e)} />
-			<Button>
-				<Link to="/board">Login</Link>
+			<Label htmlFor="deckList">Deck (.txt)</Label>
+      		<Input id="deckList" type="file" onChange={(e) => handle_file(e)} />
+			<Button asChild>
+				<Link to="/board">Jugar</Link>
 			</Button>
 		</div>
 	):(
 		<div>
-			Cargando
+			Cargando...
 		</div>
 	);
 }

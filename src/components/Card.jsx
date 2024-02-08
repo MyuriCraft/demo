@@ -7,10 +7,10 @@ import {
 	ContextMenuSub,
 	ContextMenuSubContent,
 	ContextMenuSubTrigger,
-	ContextMenuShortcut,
 } from "@/components/ui/context-menu";
 import propTypes from 'prop-types';
 import { useEffect } from "react";
+import { PopoverDemo } from "./PopoverDemo";
 
 const Card = ({ card, func_card_state, inv, place, ret_deck }) => {
 	Card.propTypes = {
@@ -39,20 +39,25 @@ const Card = ({ card, func_card_state, inv, place, ret_deck }) => {
 
 	return card['image_uris']['png'] !== undefined ? ( 
 		<ContextMenu>
-			<ContextMenuTrigger asChild className="h-full max-h-64 rounded-xl hover:scale-95 transition" >
-					<img 
-						style={{
-							rotate: card['rotacion'] ?? '0deg'
-						}}
-						onDoubleClick={() => 
-							func_card_state({
-								action: 'rotate',
-								tipo: get_type()
-							})
-						}
-						src={card['cubierta'] ? "https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg":card['image_uris']['normal']} 
-						alt={card['name'] ?? ''} 
-					/>
+			<ContextMenuTrigger  className="h-full relative h-2/6" >
+				<img 
+					style={{
+						rotate: card['rotacion'] ?? '0deg'
+					}}
+					onDoubleClick={() => 
+						func_card_state({
+							action: 'rotate',
+							tipo: get_type()
+						})
+					}
+					src={card['cubierta'] ? "https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg":card['image_uris']['normal']} 
+					alt={card['name'] ?? ''} 
+					className="max-h-56 rounded-xl hover:scale-95 transition" 
+				/>
+				{ place != 'hand' &&
+					<PopoverDemo />
+				}
+
 			</ContextMenuTrigger>
 			<ContextMenuContent className="w-64">
 				{place === 'hand' &&

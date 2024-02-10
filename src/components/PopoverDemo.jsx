@@ -9,7 +9,7 @@ import {
 
 export function PopoverDemo() {
   return (
-    <Popover  >
+    <Popover>
       <PopoverTrigger asChild>
         <div className="absolute left-0 bottom-0" >
             <Button variant="outline" size="icon">

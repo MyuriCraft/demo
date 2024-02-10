@@ -9,15 +9,13 @@ import {
 	ContextMenuSubTrigger,
 } from "@/components/ui/context-menu";
 import propTypes from 'prop-types';
-import { useEffect } from "react";
 import { PopoverDemo } from "./PopoverDemo";
 
-const Card = ({ card, func_card_state, inv, place, ret_deck }) => {
+const Card = ({ card, func_card_state, place, handle_cast }) => {
 	Card.propTypes = {
     card: propTypes.object.isRequired,
 		func_card_state: propTypes.func,
-		inv: propTypes.func,
-		ret_deck: propTypes.func,
+		handle_cast: propTypes.func,
 		place: propTypes.string.isRequired,
   };
 
@@ -33,10 +31,6 @@ const Card = ({ card, func_card_state, inv, place, ret_deck }) => {
 		return type;
 	}
 
-	useEffect(() => {
-		console.log(card)
-	}, [])
-
 	return card['image_uris']['png'] !== undefined ? ( 
 		<ContextMenu>
 			<ContextMenuTrigger  className="h-full relative h-2/6" >
@@ -44,70 +38,94 @@ const Card = ({ card, func_card_state, inv, place, ret_deck }) => {
 					style={{
 						rotate: card['rotacion'] ?? '0deg'
 					}}
-					onDoubleClick={() => 
-						func_card_state({
-							action: 'rotate',
-							tipo: get_type()
-						})
-					}
 					src={card['cubierta'] ? "https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg":card['image_uris']['normal']} 
 					alt={card['name'] ?? ''} 
 					className="max-h-56 rounded-xl hover:scale-95 transition" 
 				/>
-				{ place != 'hand' &&
-					<PopoverDemo />
-				}
-
+				{place != 'hand' && <PopoverDemo/>}
 			</ContextMenuTrigger>
 			<ContextMenuContent className="w-64">
 				{place === 'hand' &&
-					<>
-						<ContextMenuItem inset
-							onClick={() => inv()}
-						>
-							Castear
-						</ContextMenuItem>
-						
-					</>
+					<ContextMenuItem inset
+						onClick={() => handle_cast({ tipo: 3, origen: place })}
+					>
+						Castear
+					</ContextMenuItem>	
 				}	
-				{ func_card_state !== undefined &&
-					<>
-						<ContextMenuItem inset>
-							Tappear
+				{
+					place === 'tierra' ||
+					place === 'criatura' ||
+					place === 'resto' ? (
+						<ContextMenuItem 
+							onClick={() => func_card_state({ action: 'rotate', tipo: get_type() })}
+							inset
+						>
+							{card['rotacion'] === '0deg' ? 'Tappear':'Untappear'}
 						</ContextMenuItem>
-						<ContextMenuItem inset>
-							Devolver a la mano
-						</ContextMenuItem>
-						<ContextMenuSeparator />
-						<ContextMenuItem inset
-							onClick={() => 
-								func_card_state({
-									action: 'hide',
-									tipo: get_type()
-								})
-							}
-							>
-							{card['cubierta'] ? 'Mostrar':'Ocultar'}
-						</ContextMenuItem>
-					</>
+					):null
 				}
-				<ContextMenuSeparator />
-				<ContextMenuItem inset>
-					Descartar
+				{
+					place === 'cementerio' ||
+					place === 'exilio'
+					? (
+						<>
+							<ContextMenuItem 
+								onClick={() => handle_cast({ tipo: 4, origen: place })}
+								inset
+							>
+								Devolver a la mano
+							</ContextMenuItem>
+							<ContextMenuSeparator />
+							<ContextMenuItem 
+								onClick={() => func_card_state({ action: 'hide', tipo: get_type() })}
+								inset
+							>
+								{card['cubierta'] ? 'Mostrar':'Ocultar'}
+							</ContextMenuItem>
+						</>
+					):null
+				}
+				<ContextMenuSeparator/>
+				{place !== 'cementerio' && (
+				<ContextMenuItem 
+					onClick={() => handle_cast({ tipo: 0, origen: place })}
+					inset
+				>
+					Enviar al cementerio
 				</ContextMenuItem>
-				<ContextMenuItem inset>
-					Exiliar
-				</ContextMenuItem>
+				)}
+				{place !== 'exilio' && (
+					<ContextMenuItem 
+						onClick={() => handle_cast({ tipo: 1, origen: place })}
+						inset
+					>
+						Exiliar
+					</ContextMenuItem>
+				)}
 				<ContextMenuSeparator />
 				<ContextMenuSub>
 					<ContextMenuSubTrigger inset>Devolver a la librería</ContextMenuSubTrigger>
 					<ContextMenuSubContent className="w-48">
-						<ContextMenuItem inset onClick={() => ret_deck()}>
+						<ContextMenuItem 
+							onClick={() => handle_cast({ tipo: 2, origen: place })}
+							inset
+						>
 							Barajar en librería
 							{/* <ContextMenuShortcut>⇧⌘S</ContextMenuShortcut> */}
 						</ContextMenuItem>
-						<ContextMenuItem inset disabled>Enviar al fondo</ContextMenuItem>
-						<ContextMenuItem inset>Enviar al tope</ContextMenuItem>
+						<ContextMenuItem 
+							onClick={() => handle_cast({ tipo: 5, origen: place })}
+							inset 
+							//disabled
+						>
+							Enviar al fondo
+						</ContextMenuItem>
+						<ContextMenuItem 
+							onClick={() => handle_cast({ tipo: 6, origen: place })}
+							inset
+						>
+							Enviar al tope
+						</ContextMenuItem>
 						{place === 'hand' &&
 							<>
 								<ContextMenuSeparator />
@@ -116,14 +134,12 @@ const Card = ({ card, func_card_state, inv, place, ret_deck }) => {
 						}
 					</ContextMenuSubContent>
 				</ContextMenuSub>
-				{ func_card_state !== undefined &&
-					<>
-						<ContextMenuSeparator />
-						<ContextMenuItem inset>
-							Agregar Palabra Clave
-						</ContextMenuItem>
-					</>
-				}
+				<>
+					<ContextMenuSeparator />
+					<ContextMenuItem inset>
+						Agregar Palabra Clave
+					</ContextMenuItem>
+				</>
 			</ContextMenuContent>
 		</ContextMenu>
 	):(

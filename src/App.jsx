@@ -1,10 +1,8 @@
 import './App.css';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
-import { cartas } from './data/cartas';
-import Carta from './components/Carta';
-import { db } from './firebase';
-import { onValue, ref, set } from "firebase/database";
+//import { db } from './firebase';
+//import { onValue, ref, set } from "firebase/database";
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTrigger } from './components/ui/drawer';
 import { Button } from './components/ui/button';
 import Card from './components/Card';
@@ -13,6 +11,7 @@ import BoardSection from './components/layouts/BoardSection';
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Routes, Route } from 'react-router-dom';
+import { Input } from "@/components/ui/input"
 
 import {
   ContextMenu,
@@ -37,28 +36,31 @@ function App(){
 }
 
 function Board() {
-  const [id_sesion, set_id_sesion] = useState(uniqid())
-  const [mano, set_mano] = useState([])
-  const [campo_tierras, set_campo_tierras] = useState([])
-  const [campo_criaturas, set_campo_criaturas] = useState([])
-  const [deck_cartas, set_deck_cartas] = useState([])
-  const [mano_enemigo, set_mano_enemigo] = useState([])
-  const [campo_tierras_enemigo, set_campo_tierras_enemigo] = useState([])
-  const [campo_criaturas_enemigo, set_campo_criaturas_enemigo] = useState([])
-  const [vista, set_vista] = useState('propia')
-
+  const input_ref = useRef(null);
+  const [filtro, set_filtro] = useState('');
   const [jugador, set_jugador] = useState({
-    mano: [],
+    hand: [],
+    deck: [],
     tierra: [],
     criatura: [],
-    resto: []
+    resto: [],
+    cementerio: [],
+    exilio: []
   })
 
   useEffect(() => {
-    set_deck_cartas(barajar(JSON.parse(localStorage.getItem("deck"))))
+    var aux_jugador = JSON.parse(JSON.stringify(jugador));
+    aux_jugador['deck'] = barajar(JSON.parse(localStorage.getItem("deck")))
+    set_jugador(aux_jugador)
   }, [])
 
   useEffect(() => {
+    if(jugador['deck'].length === 100){
+      handle_draw(7)
+    }
+  }, [jugador['deck']])
+
+  /*useEffect(() => {
     const query = ref(db, "movimientos/");
     return onValue(query, (snapshot) => {
       if (snapshot.exists()) {
@@ -72,101 +74,16 @@ function Board() {
       }
     });
   }, [])
+  */
 
-  useEffect(() => {
+  /*useEffect(() => {
     if(mano.length > 0 || campo_criaturas.length > 0 || campo_tierras.length > 0)
     set(ref(db, 'movimientos/' + id_sesion), {
       mano: mano,
       criaturas: campo_criaturas,
       tierras: campo_tierras
     }).catch((err) => console.log(err))
-  }, [mano, campo_criaturas, campo_tierras])
-
-  function uniqid(prefix = "", random = false) {
-    const sec = Date.now() * 1000 + Math.random() * 1000;
-    const id = sec.toString(16).replace(/\./g, "").padEnd(14, "0");
-    return `${prefix}${id}${random ? `.${Math.trunc(Math.random() * 100000000)}`:""}`;
-  }
-
-  const handleClick = () => {
-    if(deck_cartas.length > 0){
-      var aux_mano = JSON.parse(JSON.stringify(mano));
-      var aux_deck = JSON.parse(JSON.stringify(deck_cartas));
-
-      aux_mano.push(aux_deck[0])
-      set_mano(aux_mano)
-
-      aux_deck.splice(0, 1)
-      set_deck_cartas(aux_deck)
-      toast.success("Carta agregada a tu mano")
-    }else{
-      toast.warning("Sin cartas")
-    }
-  }
-
-  function render_mano(){
-    var datos = Object.values(mano_enemigo);
-    if(vista === 'propia'){
-      datos = mano;
-    }
-    return(
-      <div 
-          fluid
-          style={{
-            backgroundColor: 'blue'
-          }}
-        >
-          <div>
-            {datos.map((obj, i) => (
-              <Carta  
-                key={i}
-                id={obj}
-                tipo={'mano'}
-                func_deck={(val) => {
-                  var aux_mano = JSON.parse(JSON.stringify(mano));
-                  var aux_deck = JSON.parse(JSON.stringify(deck_cartas));
-
-                  aux_mano.splice(i, 1);
-                  set_mano(aux_mano)
-                  switch (val) {
-                    case 0:
-                      aux_deck.push(obj);
-                      set_deck_cartas(barajar(aux_deck))
-                    break;
-                    case 1:
-                      aux_deck.unshift(obj);
-                      set_deck_cartas(aux_deck)
-                    break;
-                    case 2:
-                      aux_deck.push(obj);
-                      set_deck_cartas(aux_deck)
-                    break;
-                    default:
-                  }
-                  
-
-                }}
-                func_inv={() => {
-                  var aux_mano = JSON.parse(JSON.stringify(mano)); 
-                  var campo = null;
-                  if(cartas[aux_mano[i]]['tipo'] === 'tierra'){
-                    campo = JSON.parse(JSON.stringify(campo_tierras)); 
-                    campo.push(aux_mano[i]);
-                    set_campo_tierras(campo)
-                  }else{
-                    campo = JSON.parse(JSON.stringify(campo_criaturas)); 
-                    campo.push(aux_mano[i]);
-                    set_campo_criaturas(campo)
-                  }
-                  aux_mano.splice(i, 1);
-                  set_mano(aux_mano)
-                }}
-              />
-            ))}
-          </div>
-      </div>
-    )
-  }
+  }, [mano, campo_criaturas, campo_tierras])*/
 
   function get_random(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
@@ -187,129 +104,6 @@ function Board() {
     return array;
   }
 
-  function render_criaturas(){
-    var datos = Object.values(campo_criaturas_enemigo);
-    if(vista === 'propia'){
-      datos = campo_criaturas;
-    }
-    return(
-      <div 
-        fluid
-        style={{
-          backgroundColor: 'red',
-          display: "flex", 
-          flex: 2
-        }}
-      >
-        <div>
-          {datos.map((obj, i) => (
-            <div>
-              <Carta  
-                key={i}
-                id={obj}
-                tipo={'campo'}
-                func_mano={() => {
-                  var aux_mano = JSON.parse(JSON.stringify(mano));
-                  var aux_campo = JSON.parse(JSON.stringify(campo_criaturas));
-
-                  aux_campo.splice(i, 1);
-                  set_campo_criaturas(aux_campo)
-
-                  aux_mano.push(obj);
-                  set_mano(aux_mano)
-                }}
-                func_deck={(val) => {
-                  var aux_campo = JSON.parse(JSON.stringify(campo_criaturas));
-                  var aux_deck = JSON.parse(JSON.stringify(deck_cartas));
-
-                  aux_campo.splice(i, 1);
-                  set_campo_criaturas(aux_campo)
-                  switch (val) {
-                    case 0:
-                      aux_deck.push(obj);
-                      set_deck_cartas(barajar(aux_deck))
-                    break;
-                    case 1:
-                      aux_deck.unshift(obj);
-                      set_deck_cartas(aux_deck)
-                    break;
-                    case 2:
-                      aux_deck.push(obj);
-                      set_deck_cartas(aux_deck)
-                    break;
-                    default:
-                  }
-                }}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  function render_tierras(){
-    var datos = Object.values(campo_tierras_enemigo);
-    if(vista === 'propia'){
-      datos = campo_tierras;
-    }
-    console.log(datos)
-    return(
-      <div 
-        fluid
-        style={{
-          backgroundColor: 'green',
-          display: "flex", 
-          flex: 2
-        }}
-      >
-        <div>
-          {datos.map((obj, i) => (
-            <div>
-              <Carta
-                key={i}
-                id={obj}
-                tipo={'campo'}
-                func_mano={() => {
-                  var aux_mano = JSON.parse(JSON.stringify(mano));
-                  var aux_campo = JSON.parse(JSON.stringify(campo_tierras));
-
-                  aux_campo.splice(i, 1);
-                  set_campo_tierras(aux_campo)
-
-                  aux_mano.push(obj);
-                  set_mano(aux_mano)
-                }}
-                func_deck={(val) => {
-                  var aux_campo = JSON.parse(JSON.stringify(campo_tierras));
-                  var aux_deck = JSON.parse(JSON.stringify(deck_cartas));
-
-                  aux_campo.splice(i, 1);
-                  set_campo_tierras(aux_campo)
-                  switch (val) {
-                    case 0:
-                      aux_deck.push(obj);
-                      set_deck_cartas(barajar(aux_deck))
-                    break;
-                    case 1:
-                      aux_deck.unshift(obj);
-                      set_deck_cartas(aux_deck)
-                    break;
-                    case 2:
-                      aux_deck.push(obj);
-                      set_deck_cartas(aux_deck)
-                    break;
-                    default:
-                  }
-                }}
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
   const handle_card_state = ({ id, action, tipo }) => {
     var data = JSON.parse(JSON.stringify(jugador));
     console.log(tipo)
@@ -325,17 +119,130 @@ function Board() {
     set_jugador(data)
   }
 
+  function get_type(dato) {
+		var type = dato;
+    if(dato.toLowerCase().includes('creature')){
+      type = 'criatura';
+    }
+    if(dato.toLowerCase().includes('land')){
+      type = 'tierra';
+    }
+    if(
+      (
+        dato.toLowerCase().includes('enchantment') ||
+        dato.toLowerCase().includes('artifact') ||
+        dato.toLowerCase().includes('instant')
+      ) 
+        && dato.toLowerCase().includes('creature') === false
+      ){
+      type = 'resto';
+    }
+
+		return type;
+	}
+
   function render(tipo){
     return(
       jugador[tipo].map((card, i) => 
         <Card 
           key={i} 
           card={card} 
-          place={'board'}
+          place={tipo}
           func_card_state = {(action) => handle_card_state({ ...action, id: i })}
+          handle_cast={(dato) => handle_cast({ ...dato, pos: i })}
         />
       )
     )
+  }
+
+  function handle_draw(cantidad) {
+    if(jugador['deck'].length > 0){
+      var aux_jugador = JSON.parse(JSON.stringify(jugador));
+
+      for(var a = 0; a < cantidad; a++){
+        aux_jugador['hand'].push(aux_jugador['deck'][0])
+        aux_jugador['deck'].splice(0, 1)
+
+        console.log(aux_jugador['deck'][0])
+      }
+      toast.success(cantidad + " carta(s) agregada(s) a tu mano")
+      set_jugador(aux_jugador)
+    }else{
+      toast.warning("Sin cartas en deck")
+    }
+  }
+
+  function handle_cast(parametros){
+    console.log(parametros)
+    let aux_jugador = JSON.parse(JSON.stringify(jugador));
+    switch (parametros['tipo']) {
+      case 0: {
+        aux_jugador['cementerio'].push(aux_jugador[parametros['origen']][parametros['pos']])
+        aux_jugador[parametros['origen']].splice(parametros['pos'], 1);
+
+        toast.warning(aux_jugador['cementerio'][0]['name'] + ' fue enviado al cementerio')
+      }
+      break;
+      case 1: {
+        aux_jugador['exilio'].push(aux_jugador[parametros['origen']][parametros['pos']])
+        aux_jugador[parametros['origen']].splice(parametros['pos'], 1);
+
+        toast.warning(aux_jugador['exilio'][0]['name'] + ' fue exiliado')
+      }
+      break;
+      case 2: {
+        let carta = aux_jugador[parametros['origen']][parametros['pos']]['name']
+        aux_jugador['deck'].push(aux_jugador[parametros['origen']][parametros['pos']])
+        aux_jugador[parametros['origen']].splice(parametros['pos'], 1);
+        aux_jugador['deck'] = barajar(aux_jugador['deck']);
+
+        toast.warning(carta + ' fue devuelto al deck');
+      }
+      break;
+      case 3: {
+        let tipo = get_type(aux_jugador[parametros['origen']][parametros['pos']]['type_line']);
+        aux_jugador[tipo].push({
+          ...aux_jugador[parametros['origen']][parametros['pos']],
+          rotacion: '0deg',
+          cubierta: false,
+        });
+        aux_jugador[parametros['origen']].splice(parametros['pos'], 1);
+
+        toast.warning(aux_jugador[tipo][0]['name'] + ' fue casteado');
+      }
+      break;
+      case 4: {
+        let carta = aux_jugador[parametros['origen']][parametros['pos']]['name'];
+        aux_jugador['hand'].push(aux_jugador[parametros['origen']][parametros['pos']]);
+        aux_jugador[parametros['origen']].splice(parametros['pos'], 1);
+
+        toast.warning(carta + ' fue devuelta a la mano');
+      }
+      break;
+      case 5 :{
+        let carta = aux_jugador[parametros['origen']][parametros['pos']]['name'];
+        aux_jugador['deck'].push(aux_jugador[parametros['origen']][parametros['pos']]);
+        aux_jugador[parametros['origen']].splice(parametros['pos'], 1);
+
+        toast.warning(carta + ' fue enviada al fondo del deck');
+      }
+      break;
+      case 6 :{
+        let carta = aux_jugador[parametros['origen']][parametros['pos']]['name'];
+        aux_jugador['deck'].unshift(aux_jugador[parametros['origen']][parametros['pos']]);
+        aux_jugador[parametros['origen']].splice(parametros['pos'], 1);
+
+        toast.warning(carta + ' fue enviada al fondo del deck');
+      }
+      break;
+      default: toast.warning("No deberias poder ver esto")
+    }
+    set_jugador(aux_jugador)
+  }
+
+  const handle_text = event => {
+    set_filtro(event.target.value)
+    //console.log(event.target.id);
   }
 
   return(
@@ -347,10 +254,9 @@ function Board() {
         {render('resto')}
       </BoardSection>
       <BoardSection bgColor='slate-100' flexDirection='row-reverse' justifyContent='justify-between'>
-        
         <ContextMenu>
           <ContextMenuTrigger asChild >
-            <div onClick={handleClick} >
+            <div onClick={() => handle_draw(1)} >
               <img 
               src="https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg"
               alt="Deck Magic" 
@@ -371,7 +277,6 @@ function Board() {
             <ContextMenuItem inset>Buscar carta</ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
-
         <div className='flex justify-end gap-2'>
           {render('tierra')}
         </div>
@@ -389,52 +294,16 @@ function Board() {
             <DrawerHeader>
               <DrawerDescription className="flex gap-4 overflow-x-auto">
                 { 
-                  mano.map((card, i) => 
+                  jugador['hand'].map((card, i) => 
                     <Card 
                       key={i} 
                       card={card}
                       place={'hand'}
-                      ret_deck={() => {
-                        var aux_mano = JSON.parse(JSON.stringify(mano));
-                        var aux_deck = JSON.parse(JSON.stringify(deck_cartas));
-                        
-                        aux_deck.push(aux_mano[i])
-                        aux_mano.splice(i, 1)
-
-
-                        set_mano(aux_mano)
-                        set_deck_cartas(barajar(aux_deck))
-                        toast.success("Carta devuelta al deck")
-                      }}
-                      inv={() => {
-                        var aux_mano = JSON.parse(JSON.stringify(mano)); 
-                        var jugador_aux = JSON.parse(JSON.stringify(jugador));
-
-                        var tipo = 'resto';
-                        if(card['type_line'].toLowerCase().includes('creature')){
-                          tipo = 'criatura';
-                        }
-                        if(card['type_line'].toLowerCase().includes('land')){
-                          tipo = 'tierra';
-                        }
-                        
-
-                        jugador_aux[tipo].push({
-                          ...card,
-                          rotacion: '0deg',
-                          cubierta: false,
-                        });
-
-                        set_jugador(jugador_aux)
-
-                       
-                        aux_mano.splice(i, 1);
-                        set_mano(aux_mano)
-                      }}
+                      handle_cast={(tipo) => handle_cast({ ...tipo, pos: i })}
                     />
                   )
                 }
-                {mano.length === 0 && 
+                {jugador['hand'].length === 0 && 
                   <img 
                     src={handImg} 
                     className='h-64 object-cover w-[200px] border rounded-md'
@@ -443,7 +312,7 @@ function Board() {
               </DrawerDescription>
             </DrawerHeader>
             <DrawerFooter className="flex flex-row flex-row-reverse gap-4">
-              <Button onClick={handleClick} >
+              <Button onClick={() => handle_draw(1)} >
                 Robar carta
               </Button>
               <DrawerClose>
@@ -459,16 +328,31 @@ function Board() {
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
             </svg>
-
             </Button>
         </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader>
+            {jugador['cementerio'].length > 0 && <Input id='cementerio' type="text" placeholder="Nombre de carta..." onChange={handle_text} />}
             <DrawerDescription className="flex gap-4 overflow-x-auto">
-              <img 
-                src={graveyardImg}
-                className='h-64 object-cover w-[200px] border rounded-md'
-              />
+              {jugador['cementerio'].length > 0 ? (
+                <>
+                  {jugador['cementerio'].map((card, i) => { 
+                    return (card['name'].toLowerCase()).includes(filtro.toLowerCase()) && (
+                      <Card 
+                        key={i} 
+                        card={card}
+                        place={'cementerio'}
+                        handle_cast={(tipo) => handle_cast({ ...tipo, pos: i })}
+                      />
+                    )
+                  })}
+                </>
+              ):(
+                <img 
+                  src={graveyardImg}
+                  className='h-64 object-cover w-[200px] border rounded-md'
+                />
+              )}
             </DrawerDescription>
           </DrawerHeader>
           <DrawerFooter className="flex flex-row flex-row-reverse gap-4">
@@ -485,16 +369,31 @@ function Board() {
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
             </svg>
-
             </Button>
         </DrawerTrigger>
         <DrawerContent>
           <DrawerHeader>
+            {jugador['exilio'].length > 0 && <Input id='exilio' type="text" placeholder="Nombre de carta..." onChange={handle_text}/>}
             <DrawerDescription className="flex gap-4 overflow-x-auto">
-              <img 
-                src={exiledImg}
-                className='h-64 object-cover w-[200px] border rounded-md'
-              />
+              {jugador['exilio'].length > 0 ? (
+                <>
+                  {jugador['exilio'].map((card, i) => {
+                    return (card['name'].toLowerCase()).includes(filtro.toLowerCase()) && (
+                      <Card 
+                        key={i} 
+                        card={card}
+                        place={'exilio'}
+                        handle_cast={(tipo) => handle_cast({ ...tipo, pos: i })}
+                      />
+                    )
+                  })}
+                </>
+              ):(
+                <img 
+                  src={exiledImg}
+                  className='h-64 object-cover w-[200px] border rounded-md'
+                />
+              )}
             </DrawerDescription>
           </DrawerHeader>
           <DrawerFooter className="flex flex-row flex-row-reverse gap-4">
@@ -504,72 +403,9 @@ function Board() {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
-
       <Toaster position="top-right" />           
     </section>
   )
-
-  /*return(
-        <>
-          <div 
-            style={{ 
-              display: "flex", 
-              flex: 1,
-              flexDirection: 'row', 
-            }} 
-            onClick={() => set_vista(vista === 'propia' ? 'enemiga':'propia')}
-          >
-            cambiar a vista {vista === 'propia' ? 'del enemigo':'propia'}
-          </div>
-          {
-            render_criaturas()
-          }
-          {
-            render_tierras()
-          }
-          <div 
-            style={{ 
-              display: "flex", 
-              flex: 1,
-              flexDirection: 'row', 
-            }} 
-          >
-            <div style={{ display: "flex", flex: 1 }}>
-              {render_mano()}
-            </div>
-            <div 
-              style={{ 
-                display: "flex", 
-                flexDirection: 'row', 
-                backgroundColor: 'yellow', 
-                width: '20%'
-              }} 
-              onClick={() => {
-                if(deck_cartas.length > 0){
-                  var aux_mano = JSON.parse(JSON.stringify(mano));
-                  var aux_deck = JSON.parse(JSON.stringify(deck_cartas));
-                  var carta = 0
-
-
-                  aux_mano.push(aux_deck[carta])
-                  set_mano(aux_mano)
-
-                  aux_deck.splice(carta, 1)
-                  set_deck_cartas(aux_deck)
-
-  
-
-                }else{
-                  console.log(deck_cartas.length)
-                }
-              }}
-            >
-              deck
-            </div>
-          </div>
-          <hr />
-        </>
-  )*/
 }
 
 export default App;

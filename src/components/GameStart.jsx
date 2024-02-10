@@ -42,7 +42,11 @@ const GameStart = () => {
 						}
 					}
 				}
-				localStorage.setItem("deck", JSON.stringify(aux_deck));
+				if(aux_deck.length === 100){
+					localStorage.setItem("deck", JSON.stringify(aux_deck));
+				}else{
+					alert('El deck debe contenter exactamente 100 cartas')
+				}
 				set_loading(false)
 			})
     };
@@ -54,7 +58,7 @@ const GameStart = () => {
 			<Input type="text" placeholder="Jugador" />
 			<Input type="text" placeholder="Enemigo" />
 			<Label htmlFor="deckList">Deck (.txt)</Label>
-      		<Input id="deckList" type="file" onChange={(e) => handle_file(e)} />
+			<Input id="deckList" type="file" onChange={(e) => handle_file(e)} />
 			<Button asChild>
 				<Link to="/board">Jugar</Link>
 			</Button>

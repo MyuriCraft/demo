@@ -1,5 +1,5 @@
 import './App.css';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 //import { db } from './firebase';
 //import { onValue, ref, set } from "firebase/database";
@@ -36,7 +36,6 @@ function App(){
 }
 
 function Board() {
-  const input_ref = useRef(null);
   const [filtro, set_filtro] = useState('');
   const [jugador, set_jugador] = useState({
     hand: [],
@@ -131,7 +130,8 @@ function Board() {
       (
         dato.toLowerCase().includes('enchantment') ||
         dato.toLowerCase().includes('artifact') ||
-        dato.toLowerCase().includes('instant')
+        dato.toLowerCase().includes('instant') ||
+        dato.toLowerCase().includes('sorcery')
       ) 
         && dato.toLowerCase().includes('creature') === false
       ){
@@ -150,6 +150,7 @@ function Board() {
           place={tipo}
           func_card_state = {(action) => handle_card_state({ ...action, id: i })}
           handle_cast={(dato) => handle_cast({ ...dato, pos: i })}
+          handle_word={(dato) => handle_word({ ...dato, pos: i })}
         />
       )
     )
@@ -243,6 +244,25 @@ function Board() {
   const handle_text = event => {
     set_filtro(event.target.value)
     //console.log(event.target.id);
+  }
+
+  function handle_word(parametros) {
+    console.log(parametros)
+    let aux_jugador = JSON.parse(JSON.stringify(jugador));
+    switch (parametros['tipo']) {
+      case 0: {
+        aux_jugador[parametros['origen']][parametros['pos']]['contadores'].push(parametros['text'])
+        toast.warning(parametros['text'] + ' añadido')
+      }
+      break;
+      case 1: {
+        aux_jugador[parametros['origen']][parametros['pos']]['palabras'].push(parametros['text'])
+        toast.warning(parametros['text'] + ' añadido')
+      }
+      break;
+      default: toast.warning("No deberias poder ver esto")
+    }
+    set_jugador(aux_jugador)
   }
 
   return(

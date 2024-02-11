@@ -30,23 +30,27 @@ const GameStart = () => {
 					aux_deck.push({
 						...carta_data,
 						rotacion: '0deg',
-						cubierta: false
+						cubierta: false,
+						palabras: [],
+						contadores: []
 					});
 					if(obj.slice(0, index) > 1){
 						for(var a = 0; a < Number(obj.slice(0, index)) - 1; a++){
 							aux_deck.push({
 								...carta_data,
 								rotacion: '0deg',
-								cubierta: false
+								cubierta: false,
+								palabras: [],
+								contadores: []
 							});
 						}
 					}
 				}
-				if(aux_deck.length === 100){
+				//if(aux_deck.length === 100){
 					localStorage.setItem("deck", JSON.stringify(aux_deck));
-				}else{
-					alert('El deck debe contenter exactamente 100 cartas')
-				}
+				//}else{
+					//alert('El deck debe contenter exactamente 100 cartas')
+				//}
 				set_loading(false)
 			})
     };
@@ -58,7 +62,7 @@ const GameStart = () => {
 			<Input type="text" placeholder="Jugador" />
 			<Input type="text" placeholder="Enemigo" />
 			<Label htmlFor="deckList">Deck (.txt)</Label>
-			<Input id="deckList" type="file" onChange={(e) => handle_file(e)} />
+			<Input id="deckList" type="file" onChange={(e) => handle_file(e)} accept={'.txt'}/>
 			<Button asChild>
 				<Link to="/board">Jugar</Link>
 			</Button>

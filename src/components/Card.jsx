@@ -9,13 +9,26 @@ import {
 	ContextMenuSubTrigger,
 } from "@/components/ui/context-menu";
 import propTypes from 'prop-types';
-import { PopoverDemo } from "./PopoverDemo";
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { useState } from 'react';
 
-const Card = ({ card, func_card_state, place, handle_cast }) => {
+const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
+	const [power, set_power] = useState(0);
+	const [life, set_life] = useState(0);
+	const [text, set_text] = useState('');
+
 	Card.propTypes = {
     card: propTypes.object.isRequired,
 		func_card_state: propTypes.func,
 		handle_cast: propTypes.func,
+		handle_word: propTypes.func,
 		place: propTypes.string.isRequired,
   };
 
@@ -31,6 +44,23 @@ const Card = ({ card, func_card_state, place, handle_cast }) => {
 		return type;
 	}
 
+	const handle_text = event => {
+		switch (event.target.id) {
+			case 'power':
+				set_power(event.target.value)
+			break;
+			case 'life':
+				set_life(event.target.value)
+			break;
+			case 'text':
+				set_text(event.target.value)
+			break;
+		
+			default:
+				break;
+		}
+  }
+
 	return card['image_uris']['png'] !== undefined ? ( 
 		<ContextMenu>
 			<ContextMenuTrigger  className="h-full relative h-2/6" >
@@ -42,7 +72,88 @@ const Card = ({ card, func_card_state, place, handle_cast }) => {
 					alt={card['name'] ?? ''} 
 					className="max-h-56 rounded-xl hover:scale-95 transition" 
 				/>
-				{place != 'hand' && <PopoverDemo/>}
+				{place === 'tierra' ||
+					place === 'criatura' ||
+					place === 'resto' ? (
+					<Popover>
+						<PopoverTrigger asChild>
+							<div className="absolute left-0 bottom-0" >
+								<Button variant="outline" size="icon">
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+									</svg>
+								</Button>
+							</div>
+						</PopoverTrigger>
+						<PopoverContent className="w-90">
+							<div className="grid gap-4">
+								<div className="space-y-2">
+									<h4 className="font-medium">Contadores</h4>
+								</div>
+								<div className="grid gap-2">
+									<div className="grid grid-cols-3 items-center gap-4">
+										<Label htmlFor="width">Poder</Label>
+										<Input
+											id="power"
+											defaultValue="0"
+											className="col-span-2 h-8"
+											onChange={handle_text}
+										/>
+									</div>
+									<div className="grid grid-cols-3 items-center gap-4">
+										<Label htmlFor="maxWidth">Resistencia</Label>
+										<Input
+											id="life"
+											defaultValue="0"
+											className="col-span-2 h-8"
+											onChange={handle_text}
+										/>
+									</div>
+									<Button
+										onClick={() => handle_word({ tipo: 0, text: '+' + power + '/+' + life, origen: place })}
+									>
+										Añadir
+									</Button>
+									<div className="grid grid-cols-3 items-center gap-4">
+										<Label htmlFor="maxHeight">Palabra clave</Label>
+										<Input
+											id="text"
+											className="col-span-2 h-8"
+											onChange={handle_text}
+										/>
+									</div>
+									<Button
+										onClick={() => handle_word({ tipo: 1, text: text, origen: place })}
+									>
+										Añadir
+									</Button>
+									Palabras clave
+									<div>
+										{card['palabras'].map((obj, i) => 
+											<span 
+												key={i}
+												className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
+											>
+												{obj}
+											</span> 
+										)}
+									</div>
+									Contadores
+									<div>
+										{card['contadores'].map((obj, i) => 
+											<span 
+												key={i}
+												className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
+											>
+												{obj}
+											</span> 
+										)}
+									</div>
+								</div>
+							</div>
+						</PopoverContent>
+					</Popover>
+				):null}
 			</ContextMenuTrigger>
 			<ContextMenuContent className="w-64">
 				{place === 'hand' &&

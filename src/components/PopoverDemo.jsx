@@ -7,7 +7,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-export function PopoverDemo() {
+export function PopoverDemo({ palabras, contadores }) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -48,13 +48,13 @@ export function PopoverDemo() {
                 className="col-span-2 h-8"
               />
             </div>
-            <div >
+            Palabras clave
+            <div>
+              {palabras.map((obj, i) => 
                 <span className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
-                    Haste
+                    {obj}
                 </span> 
-                <span className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">
-                    Vigilance
-                </span> 
+              )}
             </div>
           </div>
         </div>

@@ -312,7 +312,7 @@ function Board() {
           </DrawerTrigger>
           <DrawerContent>
             <DrawerHeader>
-              <DrawerDescription className="flex gap-4 overflow-x-auto">
+              <DrawerDescription className="max-h-56 flex flex-row flex-nowrap gap-4 overflow-x-scroll">
                 { 
                   jugador['hand'].map((card, i) => 
                     <Card 
@@ -326,7 +326,7 @@ function Board() {
                 {jugador['hand'].length === 0 && 
                   <img 
                     src={handImg} 
-                    className='h-64 object-cover w-[200px] border rounded-md'
+                    className='h-56 object-cover w-[160px] border rounded-md'
                   />
                 }
               </DrawerDescription>

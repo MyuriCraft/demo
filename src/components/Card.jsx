@@ -63,15 +63,15 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 
 	return card['image_uris']['png'] !== undefined ? ( 
 		<ContextMenu>
-			<ContextMenuTrigger  className="h-full relative h-2/6" >
-				<img 
-					style={{
-						rotate: card['rotacion'] ?? '0deg'
-					}}
-					src={card['cubierta'] ? "https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg":card['image_uris']['normal']} 
-					alt={card['name'] ?? ''} 
-					className="max-h-56 rounded-xl hover:scale-95 transition" 
-				/>
+			<ContextMenuTrigger  className="relative h-2/6 flex-none" >
+					<img 
+						style={{
+							rotate: card['rotacion'] ?? '0deg'
+						}}
+						src={card['cubierta'] ? "https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg":card['image_uris']['normal']} 
+						alt={card['name'] ?? ''} 
+						className="max-h-56 min-h-56 rounded-xl hover:scale-95 transition " 
+					/>
 				{place === 'tierra' ||
 					place === 'criatura' ||
 					place === 'resto' ? (

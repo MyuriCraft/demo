@@ -54,3 +54,6 @@ Temporary Items
 ### macOS Patch ###
 # iCloud generated files
 *.icloud
+
+package-lock.json
+.DS_Store

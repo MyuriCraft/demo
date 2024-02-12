@@ -22,7 +22,7 @@
     "embla-carousel-react": "^8.0.0-rc21",
     "firebase": "^10.7.2",
     "lucide-react": "^0.317.0",
-    "mtgsdk": "^1.0.1",
+    "mtgsdk": "^0.2.0",
     "mtgsdk-ts": "^1.1.2",
     "next-themes": "^0.2.1",
     "react": "^18.2.0",

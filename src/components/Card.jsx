@@ -202,7 +202,7 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 					onClick={() => handle_cast({ tipo: 0, origen: place })}
 					inset
 				>
-					Enviar al cementerio
+					Descartar
 				</ContextMenuItem>
 				)}
 				{place !== 'exilio' && (
@@ -245,12 +245,13 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 						}
 					</ContextMenuSubContent>
 				</ContextMenuSub>
-				<>
-					<ContextMenuSeparator />
-					<ContextMenuItem inset>
-						Agregar Palabra Clave
-					</ContextMenuItem>
-				</>
+				<ContextMenuSeparator />
+				<ContextMenuItem inset>
+					Agregar Palabra Clave
+				</ContextMenuItem>
+				<ContextMenuItem inset>
+					Zoom (+)
+				</ContextMenuItem>
 			</ContextMenuContent>
 		</ContextMenu>
 	):(

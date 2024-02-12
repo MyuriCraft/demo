@@ -7,6 +7,7 @@ import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, Dr
 import { Button } from './components/ui/button';
 import Card from './components/Card';
 import BoardSection from './components/layouts/BoardSection';
+import { TokenGeneratorModal } from './components/TokenGeneratorModal';
 
 import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
@@ -429,7 +430,8 @@ function Board() {
         </DrawerContent>
       </Drawer>
       </div>
-      <Toaster position="top-right" />           
+      <Toaster position="top-right" />      
+      <TokenGeneratorModal />  
     </section>
   )
 }

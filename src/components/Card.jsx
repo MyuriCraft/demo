@@ -23,6 +23,7 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 	const [power, set_power] = useState(0);
 	const [life, set_life] = useState(0);
 	const [text, set_text] = useState('');
+	const [face, set_face] = useState(0);
 
 	Card.propTypes = {
     card: propTypes.object.isRequired,
@@ -61,14 +62,27 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 		}
   }
 
-	return card['image_uris']['png'] !== undefined ? ( 
+	function set_imagen() {
+		try{
+			if(card['card_faces'] !== undefined){
+				return card['card_faces'][face]['image_uris']['normal']
+			}else{
+				return card['image_uris']['normal']
+			}
+		}catch(error){
+			console.log(card)
+			return "https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg"
+		}
+	}
+
+	return( 
 		<ContextMenu>
 			<ContextMenuTrigger  className="relative h-56 flex-none" >
 					<img 
 						style={{
 							rotate: card['rotacion'] ?? '0deg'
 						}}
-						src={card['cubierta'] ? "https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg":card['image_uris']['normal']} 
+						src={card['cubierta'] ? "https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg":set_imagen()} 
 						alt={card['name'] ?? ''} 
 						className="max-h-56 min-h-56 rounded-xl hover:scale-95 transition " 
 					/>
@@ -90,6 +104,13 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 								<div className="space-y-2">
 									<h4 className="font-medium">Contadores</h4>
 								</div>
+								{card['card_faces'] !== undefined && 
+									<Button
+										onClick={() => set_face(face === 0 ? 1:0)}
+									>
+										Rotar
+									</Button>
+								}
 								<div className="grid gap-2">
 									<div className="grid grid-cols-3 items-center gap-4">
 										<Label htmlFor="width">Poder</Label>
@@ -156,13 +177,13 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 				):null}
 			</ContextMenuTrigger>
 			<ContextMenuContent className="w-64">
-				{place === 'hand' &&
+				{place === 'hand' || place === 'commander' || place === 'deck' ? (
 					<ContextMenuItem inset
 						onClick={() => handle_cast({ tipo: 3, origen: place })}
 					>
 						Castear
 					</ContextMenuItem>	
-				}	
+				):null}	
 				{
 					place === 'tierra' ||
 					place === 'criatura' ||
@@ -177,22 +198,24 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 				}
 				{
 					place === 'cementerio' ||
-					place === 'exilio'
+					place === 'exilio' ||
+					place === 'deck'
 					? (
 						<>
 							<ContextMenuItem 
 								onClick={() => handle_cast({ tipo: 4, origen: place })}
 								inset
 							>
-								Devolver a la mano
+								Mandar a la mano
 							</ContextMenuItem>
 							<ContextMenuSeparator />
+							{place !== 'deck' && 
 							<ContextMenuItem 
 								onClick={() => func_card_state({ action: 'hide', tipo: get_type() })}
 								inset
 							>
 								{card['cubierta'] ? 'Mostrar':'Ocultar'}
-							</ContextMenuItem>
+							</ContextMenuItem>}
 						</>
 					):null
 				}
@@ -202,7 +225,7 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 					onClick={() => handle_cast({ tipo: 0, origen: place })}
 					inset
 				>
-					Descartar
+					Mandar al cementerio
 				</ContextMenuItem>
 				)}
 				{place !== 'exilio' && (
@@ -214,6 +237,16 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 					</ContextMenuItem>
 				)}
 				<ContextMenuSeparator />
+				{card['commander'] && place !== 'commander' && place !== 'deck' ? (
+					<ContextMenuItem 
+						onClick={() => handle_cast({ tipo: 7, origen: place })}
+						inset
+					>
+						Devolver a zona de commander
+					</ContextMenuItem>
+				):null}
+				<ContextMenuSeparator />
+				{place !== 'deck' &&
 				<ContextMenuSub>
 					<ContextMenuSubTrigger inset>Devolver a la librería</ContextMenuSubTrigger>
 					<ContextMenuSubContent className="w-48">
@@ -244,18 +277,11 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 							</>
 						}
 					</ContextMenuSubContent>
-				</ContextMenuSub>
+				</ContextMenuSub>}
 				<ContextMenuSeparator />
-				<ContextMenuItem inset>
-					Rotar carta
-				</ContextMenuItem>
 			</ContextMenuContent>
 		</ContextMenu>
-	):(
-		<div>
-			no deberias poder ver esto
-		</div>
-	);
+	)
 }
 
 export default Card

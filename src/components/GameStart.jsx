@@ -17,37 +17,58 @@ const GameStart = () => {
 		set_loading(true);
 		localStorage.setItem("deck", '');
 		var aux_deck = [];
+		var aux_comm = [];
 		const reader = new FileReader()
     reader.onload = async (e) => { 
       const text = (e.target.result)
 			text.split('\n').map(async (obj) => {
 				if(obj !== ''){
-					const index = obj.indexOf(' ');
-					
-					console.log(obj)
-					var carta_data = await fetch_card(obj.slice(index, obj.length).replaceAll(' ', '+'));
-					console.log(carta_data)
-					aux_deck.push({
-						...carta_data,
-						rotacion: '0deg',
-						cubierta: false,
-						palabras: [],
-						contadores: []
-					});
-					if(obj.slice(0, index) > 1){
-						for(var a = 0; a < Number(obj.slice(0, index)) - 1; a++){
+					const index = obj.indexOf(' ');	
+
+					const index_com = obj.indexOf('/');
+					console.log('->', index_com)
+
+					var carta_data = await fetch_card(obj.slice(index, obj.length).replaceAll('/', '').replaceAll(' ', '+'));
+					if(carta_data['object'] !== 'error'){
+						if(index_com >= 0){
+							aux_comm.push({
+								...carta_data,
+								rotacion: '0deg',
+								cubierta: false,
+								palabras: [],
+								contadores: [],
+								commander: true
+							});
+						}else{
+							console.log(carta_data)
 							aux_deck.push({
 								...carta_data,
 								rotacion: '0deg',
 								cubierta: false,
 								palabras: [],
-								contadores: []
+								contadores: [],
+								commander: true
 							});
+							if(obj.slice(0, index) > 1){
+								for(var a = 0; a < Number(obj.slice(0, index)) - 1; a++){
+									aux_deck.push({
+										...carta_data,
+										rotacion: '0deg',
+										cubierta: false,
+										palabras: [],
+										contadores: [],
+										commander: true
+									});
+								}
+							}
 						}
 					}
+				}else{
+					console.log(obj)
 				}
 				//if(aux_deck.length === 100){
 					localStorage.setItem("deck", JSON.stringify(aux_deck));
+					localStorage.setItem("comm", JSON.stringify(aux_comm));
 				//}else{
 					//alert('El deck debe contenter exactamente 100 cartas')
 				//}

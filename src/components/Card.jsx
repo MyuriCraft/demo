@@ -63,7 +63,7 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 
 	return card['image_uris']['png'] !== undefined ? ( 
 		<ContextMenu>
-			<ContextMenuTrigger  className="relative h-2/6 flex-none" >
+			<ContextMenuTrigger  className="relative h-56 flex-none" >
 					<img 
 						style={{
 							rotate: card['rotacion'] ?? '0deg'
@@ -78,11 +78,11 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 					<Popover>
 						<PopoverTrigger asChild>
 							<div className="absolute left-0 bottom-0" >
-								<Button variant="outline" size="icon">
-									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-										<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-									</svg>
-								</Button>
+								<button className="bg-white rounded">
+									<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+									<path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+								</svg>
+								</button>
 							</div>
 						</PopoverTrigger>
 						<PopoverContent className="w-90">

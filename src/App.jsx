@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { Routes, Route } from 'react-router-dom';
 import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
 
 import {
   ContextMenu,
@@ -280,7 +281,7 @@ function Board() {
               <img 
               src="https://m.media-amazon.com/images/I/61AGZ37D7eL.jpg"
               alt="Deck Magic" 
-              className='h-full rounded-xl hover:scale-95 transition'
+              className='h-56 w-[160px] rounded-xl hover:scale-95 transition'
               />
             </div>
           </ContextMenuTrigger>
@@ -301,13 +302,15 @@ function Board() {
           {render('tierra')}
         </div>
       </BoardSection>
-      {/* Drawer para ver MANO */}
+      <div className="absolute bottom-0 right-[180px]">
+        {/* Drawer para ver MANO */}
         <Drawer>
           <DrawerTrigger>
-            <Button variant="outline" className="absolute bottom-0 right-[0px]" size="icon">
+            <Button variant="outline">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10.05 4.575a1.575 1.575 0 1 0-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 0 1 3.15 0v1.5m-3.15 0 .075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 0 1 3.15 0V15M6.9 7.575a1.575 1.575 0 1 0-3.15 0v8.175a6.75 6.75 0 0 0 6.75 6.75h2.018a5.25 5.25 0 0 0 3.712-1.538l1.732-1.732a5.25 5.25 0 0 0 1.538-3.712l.003-2.024a.668.668 0 0 1 .198-.471 1.575 1.575 0 1 0-2.228-2.228 3.818 3.818 0 0 0-1.12 2.687M6.9 7.575V12m6.27 4.318A4.49 4.49 0 0 1 16.35 15m.002 0h-.002" />
-              </svg>
+              </svg> 
+              <Badge variant="outline">{jugador['hand'].length}</Badge>
             </Button>
           </DrawerTrigger>
           <DrawerContent>
@@ -344,10 +347,11 @@ function Board() {
       {/* Drawer para ver CEMENTERIO */}
       <Drawer>
         <DrawerTrigger>
-            <Button variant="outline" className="absolute bottom-0 right-[40px]" size="icon">
+            <Button variant="outline">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M22 10.5h-6m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM4 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 10.374 21c-2.331 0-4.512-.645-6.374-1.766Z" />
             </svg>
+              <Badge variant="outline">{jugador['cementerio'].length}</Badge>
             </Button>
         </DrawerTrigger>
         <DrawerContent>
@@ -385,10 +389,11 @@ function Board() {
       {/* Drawer para ver EXILIO */}
       <Drawer>
         <DrawerTrigger>
-            <Button variant="outline" className="absolute bottom-0 right-[80px]" size="icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-            </svg>
+            <Button variant="outline">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+              <Badge variant="outline">{jugador['exilio'].length}</Badge>
             </Button>
         </DrawerTrigger>
         <DrawerContent>
@@ -411,7 +416,7 @@ function Board() {
               ):(
                 <img 
                   src={exiledImg}
-                  className='h-64 object-cover w-[200px] border rounded-md'
+                  className='h-64 object-cover w-[160px] border rounded-md'
                 />
               )}
             </DrawerDescription>
@@ -423,6 +428,7 @@ function Board() {
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
+      </div>
       <Toaster position="top-right" />           
     </section>
   )

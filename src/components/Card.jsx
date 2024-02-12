@@ -247,10 +247,7 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 				</ContextMenuSub>
 				<ContextMenuSeparator />
 				<ContextMenuItem inset>
-					Agregar Palabra Clave
-				</ContextMenuItem>
-				<ContextMenuItem inset>
-					Zoom (+)
+					Rotar carta
 				</ContextMenuItem>
 			</ContextMenuContent>
 		</ContextMenu>

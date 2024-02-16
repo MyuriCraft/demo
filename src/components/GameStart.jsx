@@ -6,12 +6,24 @@ import { Label } from "@/components/ui/label"
 
 const GameStart = () => {
 	const [loading, set_loading] = useState(false);
+	const [jugadores, set_jugadores] = useState({
+		usuario: '',
+		rival: ''
+	});
 
 	const fetch_card = async (carta) => {
 		const response = await fetch('https://api.scryfall.com/cards/named?fuzzy=' + carta)
 		const data = await response.json()
 		return data;
 	}
+
+	const handle_text = event => {
+		var aux_jugadores = JSON.parse(JSON.stringify(jugadores));
+		aux_jugadores[event.target.id] = event.target.value;
+		set_jugadores(aux_jugadores)
+
+		localStorage.setItem("jugadores", JSON.stringify(aux_jugadores));
+  }
 
 	async function handle_file(e){
 		set_loading(true);
@@ -80,8 +92,20 @@ const GameStart = () => {
 
 	return !loading ? ( 
 		<div className="grid gap-4 place-content-center h-dvh bg-blue-50">
-			<Input type="text" placeholder="Jugador" />
-			<Input type="text" placeholder="Enemigo" />
+			<Input 
+				id='usuario'
+				type="text" 
+				placeholder="Jugador"
+				onChange={handle_text}
+				value={jugadores['usuario']}
+			/>
+			<Input 
+				id='rival'
+				type="text" 
+				placeholder="Enemigo" 
+				onChange={handle_text}
+				value={jugadores['rival']}
+			/>
 			<Label htmlFor="deckList">Deck (.txt)</Label>
 			<Input id="deckList" type="file" onChange={(e) => handle_file(e)} accept={'.txt'}/>
 			<Button asChild>

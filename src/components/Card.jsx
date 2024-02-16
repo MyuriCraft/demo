@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/popover";
 import { useState } from 'react';
 
-const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
+const Card = ({ card, func_card_state, place, handle_cast, handle_word, jugador, generate_copy }) => {
 	const [power, set_power] = useState(0);
 	const [life, set_life] = useState(0);
 	const [text, set_text] = useState('');
@@ -31,6 +31,8 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 		handle_cast: propTypes.func,
 		handle_word: propTypes.func,
 		place: propTypes.string.isRequired,
+		jugador: propTypes.bool.isRequired,
+		generate_copy: propTypes.func,
   };
 
 	function get_type() {
@@ -112,45 +114,49 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 									</Button>
 								}
 								<div className="grid gap-2">
-									<div className="grid grid-cols-3 items-center gap-4">
-										<Label htmlFor="width">Poder</Label>
-										<Input
-											id="power"
-											defaultValue="0"
-											className="col-span-2 h-8"
-											onChange={handle_text}
-										/>
-									</div>
-									<div className="grid grid-cols-3 items-center gap-4">
-										<Label htmlFor="maxWidth">Resistencia</Label>
-										<Input
-											id="life"
-											defaultValue="0"
-											className="col-span-2 h-8"
-											onChange={handle_text}
-										/>
-									</div>
-									<Button
-										onClick={() => handle_word({ tipo: 0, text: '+' + power + '/+' + life, origen: place })}
-									>
-										Añadir
-									</Button>
-									<div className="grid grid-cols-3 items-center gap-4">
-										<Label htmlFor="maxHeight">Palabra clave</Label>
-										<Input
-											id="text"
-											className="col-span-2 h-8"
-											onChange={handle_text}
-										/>
-									</div>
-									<Button
-										onClick={() => handle_word({ tipo: 1, text: text, origen: place })}
-									>
-										Añadir
-									</Button>
+									{!jugador &&
+										<>
+										<div className="grid grid-cols-3 items-center gap-4">
+											<Label htmlFor="width">Poder</Label>
+											<Input
+												id="power"
+												defaultValue="0"
+												className="col-span-2 h-8"
+												onChange={handle_text}
+											/>
+										</div>
+										<div className="grid grid-cols-3 items-center gap-4">
+											<Label htmlFor="maxWidth">Resistencia</Label>
+											<Input
+												id="life"
+												defaultValue="0"
+												className="col-span-2 h-8"
+												onChange={handle_text}
+											/>
+										</div>
+										<Button
+											onClick={() => handle_word({ tipo: 0, text: '+' + power + '/+' + life, origen: place })}
+										>
+											Añadir
+										</Button>
+										<div className="grid grid-cols-3 items-center gap-4">
+											<Label htmlFor="maxHeight">Palabra clave</Label>
+											<Input
+												id="text"
+												className="col-span-2 h-8"
+												onChange={handle_text}
+											/>
+										</div>
+										<Button
+											onClick={() => handle_word({ tipo: 1, text: text, origen: place })}
+										>
+											Añadir
+										</Button>
+										</>
+									}
 									Palabras clave
 									<div>
-										{card['palabras'].map((obj, i) => 
+										{(card['palabras'] ?? []).map((obj, i) => 
 											<span 
 												key={i}
 												className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
@@ -161,7 +167,7 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 									</div>
 									Contadores
 									<div>
-										{card['contadores'].map((obj, i) => 
+										{(card['contadores'] ?? []).map((obj, i) => 
 											<span 
 												key={i}
 												className="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10"
@@ -176,110 +182,119 @@ const Card = ({ card, func_card_state, place, handle_cast, handle_word }) => {
 					</Popover>
 				):null}
 			</ContextMenuTrigger>
-			<ContextMenuContent className="w-64">
-				{place === 'hand' || place === 'commander' || place === 'deck' ? (
-					<ContextMenuItem inset
-						onClick={() => handle_cast({ tipo: 3, origen: place })}
-					>
-						Castear
-					</ContextMenuItem>	
-				):null}	
-				{
-					place === 'tierra' ||
-					place === 'criatura' ||
-					place === 'resto' ? (
-						<ContextMenuItem 
-							onClick={() => func_card_state({ action: 'rotate', tipo: get_type() })}
-							inset
+			{!jugador ? (
+				<ContextMenuContent className="w-64">
+					{place === 'hand' || place === 'commander' || place === 'deck' ? (
+						<ContextMenuItem inset
+							onClick={() => handle_cast({ tipo: 3, origen: place })}
 						>
-							{card['rotacion'] === '0deg' ? 'Tappear':'Untappear'}
-						</ContextMenuItem>
-					):null
-				}
-				{
-					place === 'cementerio' ||
-					place === 'exilio' ||
-					place === 'deck'
-					? (
-						<>
+							Castear
+						</ContextMenuItem>	
+					):null}	
+					{
+						place === 'tierra' ||
+						place === 'criatura' ||
+						place === 'resto' ? (
 							<ContextMenuItem 
-								onClick={() => handle_cast({ tipo: 4, origen: place })}
+								onClick={() => func_card_state({ action: 'rotate', tipo: get_type() })}
 								inset
 							>
-								Mandar a la mano
+								{card['rotacion'] === '0deg' ? 'Tappear':'Untappear'}
 							</ContextMenuItem>
-							<ContextMenuSeparator />
-							{place !== 'deck' && 
+						):null
+					}
+					{
+						place === 'cementerio' ||
+						place === 'exilio' ||
+						place === 'deck'
+						? (
+							<>
+								<ContextMenuItem 
+									onClick={() => handle_cast({ tipo: 4, origen: place })}
+									inset
+								>
+									Mandar a la mano
+								</ContextMenuItem>
+								<ContextMenuSeparator />
+								{place !== 'deck' && 
+								<ContextMenuItem 
+									onClick={() => func_card_state({ action: 'hide', tipo: get_type() })}
+									inset
+								>
+									{card['cubierta'] ? 'Mostrar':'Ocultar'}
+								</ContextMenuItem>}
+							</>
+						):null
+					}
+					<ContextMenuSeparator/>
+					{place !== 'cementerio' && (
+					<ContextMenuItem 
+						onClick={() => handle_cast({ tipo: 0, origen: place })}
+						inset
+					>
+						Mandar al cementerio
+					</ContextMenuItem>
+					)}
+					{place !== 'exilio' && (
+						<ContextMenuItem 
+							onClick={() => handle_cast({ tipo: 1, origen: place })}
+							inset
+						>
+							Exiliar
+						</ContextMenuItem>
+					)}
+					<ContextMenuSeparator />
+					{card['commander'] && place !== 'commander' && place !== 'deck' ? (
+						<ContextMenuItem 
+							onClick={() => handle_cast({ tipo: 7, origen: place })}
+							inset
+						>
+							Devolver a zona de commander
+						</ContextMenuItem>
+					):null}
+					<ContextMenuSeparator />
+					{place !== 'deck' &&
+					<ContextMenuSub>
+						<ContextMenuSubTrigger inset>Devolver a la librería</ContextMenuSubTrigger>
+						<ContextMenuSubContent className="w-48">
 							<ContextMenuItem 
-								onClick={() => func_card_state({ action: 'hide', tipo: get_type() })}
+								onClick={() => handle_cast({ tipo: 2, origen: place })}
 								inset
 							>
-								{card['cubierta'] ? 'Mostrar':'Ocultar'}
-							</ContextMenuItem>}
-						</>
-					):null
-				}
-				<ContextMenuSeparator/>
-				{place !== 'cementerio' && (
-				<ContextMenuItem 
-					onClick={() => handle_cast({ tipo: 0, origen: place })}
-					inset
-				>
-					Mandar al cementerio
-				</ContextMenuItem>
-				)}
-				{place !== 'exilio' && (
-					<ContextMenuItem 
-						onClick={() => handle_cast({ tipo: 1, origen: place })}
-						inset
+								Barajar en librería
+							</ContextMenuItem>
+							<ContextMenuItem 
+								onClick={() => handle_cast({ tipo: 5, origen: place })}
+								inset 
+							>
+								Enviar al fondo
+							</ContextMenuItem>
+							<ContextMenuItem 
+								onClick={() => handle_cast({ tipo: 6, origen: place })}
+								inset
+							>
+								Enviar al tope
+							</ContextMenuItem>
+							{place === 'hand' &&
+								<>
+									<ContextMenuSeparator />
+									<ContextMenuItem inset>Revelar</ContextMenuItem>
+								</>
+							}
+						</ContextMenuSubContent>
+					</ContextMenuSub>}
+					<ContextMenuSeparator />
+				</ContextMenuContent>
+			):(
+				<ContextMenuContent className="w-64">
+					<ContextMenuItem inset
+						onClick={() => generate_copy(card)}
 					>
-						Exiliar
-					</ContextMenuItem>
-				)}
-				<ContextMenuSeparator />
-				{card['commander'] && place !== 'commander' && place !== 'deck' ? (
-					<ContextMenuItem 
-						onClick={() => handle_cast({ tipo: 7, origen: place })}
-						inset
-					>
-						Devolver a zona de commander
-					</ContextMenuItem>
-				):null}
-				<ContextMenuSeparator />
-				{place !== 'deck' &&
-				<ContextMenuSub>
-					<ContextMenuSubTrigger inset>Devolver a la librería</ContextMenuSubTrigger>
-					<ContextMenuSubContent className="w-48">
-						<ContextMenuItem 
-							onClick={() => handle_cast({ tipo: 2, origen: place })}
-							inset
-						>
-							Barajar en librería
-							{/* <ContextMenuShortcut>⇧⌘S</ContextMenuShortcut> */}
-						</ContextMenuItem>
-						<ContextMenuItem 
-							onClick={() => handle_cast({ tipo: 5, origen: place })}
-							inset 
-							//disabled
-						>
-							Enviar al fondo
-						</ContextMenuItem>
-						<ContextMenuItem 
-							onClick={() => handle_cast({ tipo: 6, origen: place })}
-							inset
-						>
-							Enviar al tope
-						</ContextMenuItem>
-						{place === 'hand' &&
-							<>
-								<ContextMenuSeparator />
-								<ContextMenuItem inset>Revelar</ContextMenuItem>
-							</>
-						}
-					</ContextMenuSubContent>
-				</ContextMenuSub>}
-				<ContextMenuSeparator />
-			</ContextMenuContent>
+						Generar copia en mi campo
+					</ContextMenuItem>	
+				</ContextMenuContent>
+			)
+			}
 		</ContextMenu>
 	)
 }
